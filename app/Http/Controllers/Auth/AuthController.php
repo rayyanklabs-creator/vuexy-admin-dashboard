@@ -26,7 +26,7 @@ class AuthController extends Controller
     public function login_verification()
     {
         if (Auth::user() && Auth::user()->email_verified_at !== null) {
-            return view('auth.verification');
+            return view('auth.verify-email');
         } else {
             return redirect()->route('dashboard');
         }

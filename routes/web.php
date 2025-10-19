@@ -6,9 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+
 
 Auth::routes();
 Route::group(['middleware' => ['guest']], function () {
@@ -23,10 +21,11 @@ Route::group(['middleware' => ['guest']], function () {
 
 
 Route::group(['middleware' => ['auth']], function () {
-    
+    Route::get('login-verification', [AuthController::class, 'login_verification'])->name('login.verification');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     // Verified notification
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verification_verify'])->middleware(['signed'])->name('verification.verify');
-        Route::get('email/verify', [AuthController::class, 'verification_notice'])->name('verification.notice');
+    Route::get('email/verify', [AuthController::class, 'verification_notice'])->name('verification.notice');
     Route::post('email/verification-notification', [AuthController::class, 'verification_send'])->middleware(['throttle:2,1'])->name('verification.send');
 });
 

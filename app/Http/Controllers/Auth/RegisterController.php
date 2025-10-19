@@ -53,7 +53,6 @@ class RegisterController extends Controller
         }
 
         try {
-            DB::beginTransaction();
             $user = new User();
             $user->name = $request->name;
             $user->email = $request->email;
@@ -64,18 +63,6 @@ class RegisterController extends Controller
             $user->syncRoles(User::USER);
 
             Auth::attempt(['email' => $request->email, 'password' => $request->password]);
-            // if (Auth::check()) {
-
-            //     VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
-            //         return (new MailMessage)
-            //             ->subject('Verify Email Address')
-            //             ->line('Click the button below to verify your email address.')
-            //             ->action('Verify Email Address', $url);
-            //     });
-            // }
-            // $user->sendEmailVerificationNotification();
-            DB::commit();
-
             return redirect()->route('login')->with('success', 'Your account has been created successfully.');
         } catch (\Throwable $th) {
             Log::error('User registration failed', ['error' => $th->getMessage()]);
