@@ -22,12 +22,12 @@
     <!-- Register -->
     <div class="d-flex col-12 col-lg-4 align-items-center authentication-bg p-sm-12 p-6">
         <div class="w-px-400 mx-auto mt-12 pt-5">
-            <h4 class="mb-1">{{__('Adventure starts here')}} 🚀</h4>
+            <h4 class="mb-1">{{__('Create your Accounts')}} 🚀</h4>
             <p class="mb-6">{{__('Make your app management easy and fun!')}}</p>
 
-            <form id="formAuthentication" class="mb-6" action="#" method="POST">
+            <form id="formAuthentication" class="mb-6" action="{{ route('register.attempt') }}" method="POST">
                 @csrf
-                <div class="mb-6">
+                <div class="mb-6 form-control-validation">
                     <label for="name" class="form-label">{{__('Name')}}</label><span class="text-danger">*</span>
                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
                         value="{{ old('name') }}" id="name" name="name" placeholder="{{__('Enter your name')}}" autofocus required />
@@ -37,7 +37,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="mb-6">
+                <div class="mb-6 form-control-validation">
                     <label for="email" class="form-label">{{__('Email')}}</label><span class="text-danger">*</span>
                     <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
                         value="{{ old('email') }}" placeholder="{{__('Enter your email')}}" required/>
@@ -47,7 +47,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="mb-6 form-password-toggle">
+                <div class="mb-6 form-control-validation form-password-toggle">
                     <label class="form-label" for="password">{{__('Password')}}</label><span class="text-danger">*</span>
                     <div class="input-group input-group-merge">
                         <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password"
@@ -61,7 +61,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="mb-6 form-password-toggle">
+                <div class="mb-6 form-control-validation form-password-toggle">
                     <label class="form-label" for="confirm-password">{{__('Confirm Password')}}</label><span class="text-danger">*</span>
                     <div class="input-group input-group-merge">
                         <input type="password" id="confirm-password" class="form-control @error('confirm-password') is-invalid @enderror" name="confirm-password"
@@ -70,20 +70,6 @@
                         <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
                     </div>
                     @error('confirm-password')
-                        <span class="invalid-feedback" role="alert">
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                <div class="mb-6 mt-8">
-                    <div class="form-check mb-8 ms-2">
-                        <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" id="terms-conditions" name="terms" required  {{ old('terms') == 'on' ? 'checked' : '' ; }}/>
-                        <label class="form-check-label" for="terms-conditions">
-                            {{__('I agree to')}} <a href="javascript:void(0);">{{__('privacy policy & terms')}}</a>
-                        </label>
-                    </div>
-                    @error('terms')
                         <span class="invalid-feedback" role="alert">
                             {{ $message }}
                         </span>

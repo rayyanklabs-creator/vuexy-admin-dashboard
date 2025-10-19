@@ -45,7 +45,6 @@ class RegisterController extends Controller
                     ->symbols()
             ],
             'confirm-password' => 'required|same:password',
-            'terms' => 'required|string|max:255',
         ];
 
         $validate = Validator::make($request->all(), $rules);
@@ -62,20 +61,19 @@ class RegisterController extends Controller
             $user->username = $this->generateUsername($request->name);
             $user->save();
 
-            $profile = new Profile();
-            $profile->user_id = $user->id;
-            $profile->first_name = $request->name;
-            $profile->save();
-            Auth::attempt(['email' => $request->email, 'password' => $request->password]);
-            if (Auth::check()) {
+            $user->syncRoles(User::USER);
 
-                VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
-                    return (new MailMessage)
-                        ->subject('Verify Email Address')
-                        ->line('Click the button below to verify your email address.')
-                        ->action('Verify Email Address', $url);
-                });
-            }
+            Auth::attempt(['email' => $request->email, 'password' => $request->password]);
+            // if (Auth::check()) {
+
+            //     VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+            //         return (new MailMessage)
+            //             ->subject('Verify Email Address')
+            //             ->line('Click the button below to verify your email address.')
+            //             ->action('Verify Email Address', $url);
+            //     });
+            // }
+            // $user->sendEmailVerificationNotification();
             DB::commit();
 
             return redirect()->route('login')->with('success', 'Your account has been created successfully.');
