@@ -15,21 +15,13 @@
 
 <body>
     <!-- Content -->
-
-    <div class="authentication-wrapper authentication-cover">
-        <!-- Logo -->
-        <a href="" class="app-brand auth-cover-brand">
-            <span class="app-brand-logo demo">
-                {{-- <img src="{{ asset(\App\Helpers\Helper::getLogoLight()) }}" alt="{{\App\Helpers\Helper::getCompanyName()}}"> --}}
-            </span>
-            <span class="app-brand-text demo text-heading fw-bold"><img src="{{ asset('assets/img/logo/default.svg') }}"> Vuexy</span>
-        </a>
-        <!-- /Logo -->
-        <div class="authentication-inner row m-0">
-            @yield('content')
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner py-6">
+                @yield('content')
+            </div>
         </div>
     </div>
-
     <!-- / Content -->
 
     @include('layouts.script')
