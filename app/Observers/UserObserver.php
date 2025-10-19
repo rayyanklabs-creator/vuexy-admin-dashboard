@@ -23,6 +23,7 @@ class UserObserver
             'last_name'  => explode(' ', $user->name)[1] ?? '',
         ]);
 
+        // If the admin created a role
         if (isset($user->assigned_role)) {
             $user->syncRoles($user->assigned_role);
 

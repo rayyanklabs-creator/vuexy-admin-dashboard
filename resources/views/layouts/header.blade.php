@@ -141,9 +141,8 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0">{{ Auth::user()->name ?? 'rayyan' }}</h6>
-                                    <small class="text-muted">{{ Auth::user()->username ?? 'rayyan' }}</small>
-                                    {{-- <small class="text-muted">{{ Str::title(str_replace('-', ' ', Auth::user()->getRoleNames()->first())) }}</small> --}}
+                                    <h6 class="mb-0">{{ Auth::user()->name }}</h6>
+                                    <small class="text-muted">{{ Auth::user()->username }}</small>
                                 </div>
                             </div>
                         </a>
@@ -163,15 +162,7 @@
                                 class="align-middle">{{ __('Settings') }}</span>
                         </a>
                     </li>
-                    <li>
-                        <div class="dropdown-divider my-1 mx-n2"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="pages-faq.html">
-                            <i class="ti ti-question-mark me-3 ti-md"></i><span
-                                class="align-middle">{{ __('FAQ') }}</span>
-                        </a>
-                    </li>
+                    
                     <li>
                         <div class="d-grid px-2 pt-2 pb-1">
                             <a class="btn btn-sm btn-danger d-flex" style="color: #fff ;"
@@ -179,7 +170,7 @@
                                 <small class="align-middle">{{ __('Logout') }}</small>
                                 <i class="ti ti-logout ms-2 ti-14px"></i>
                             </a>
-                            <form id="logout-form" action="#" method="POST" class="d-none">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
                         </div>

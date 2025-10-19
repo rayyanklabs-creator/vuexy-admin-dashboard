@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="{{ route('dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
-                <img src="{{asset('assets/img/logo/default.svg')}}" alt="{{env('APP_NAME')}}">
+                <img src="{{ asset('assets/img/logo/default.svg') }}" alt="{{ env('APP_NAME') }}">
             </span>
             {{-- <span class="app-brand-text demo menu-text fw-bold">{{\App\Helpers\Helper::getCompanyName()}}</span> --}}
             <span class="app-brand-text demo menu-text fw-bold">Vuexy</span>
@@ -21,21 +21,40 @@
         <li class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <a href="{{ route('dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
-                <div>{{__('Dashboard')}}</div>
+                <div>{{ __('Dashboard') }}</div>
             </a>
         </li>
 
         <!-- Apps & Pages -->
         <li class="menu-header small">
-            <span class="menu-header-text">{{__('Apps & Pages')}}</span>
+            <span class="menu-header-text">{{ __('Apps & Pages') }}</span>
         </li>
-        <li class="menu-item {{ request()->routeIs('reports') ? 'active' : '' }}">
-            <a href="{{ route('reports') }}" class="menu-link">
-                <i class="menu-icon tf-icons ti ti-address-book"></i> {{-- Contacts --}}
-                <div>{{ __('Reports') }}</div>
+        <li
+            class="menu-item {{ request()->routeIs('dashboard.roles.*') || request()->routeIs('dashboard.permissions.*') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                {{-- <i class="menu-icon tf-icons ti ti-settings"></i> --}}
+                <i class="menu-icon tf-icons ti ti-shield-lock"></i>
+                <div>{{ __('Roles & Permissions') }}</div>
             </a>
+            
+            @canany(['view role', 'view permission'])
+                <ul class="menu-sub">
+                    @can(['view role'])
+                        <li class="menu-item {{ request()->routeIs('dashboard.roles.*') ? 'active' : '' }}">
+                            <a href="{{ route('dashboard.roles.index') }}" class="menu-link">
+                                <div>{{ __('Roles') }}</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @can(['view permission'])
+                        <li class="menu-item {{ request()->routeIs('dashboard.permissions.*') ? 'active' : '' }}">
+                            <a href="{{ route('dashboard.permissions.index') }}" class="menu-link">
+                                <div>{{ __('Permissions') }}</div>
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            @endcan
         </li>
-        {{-- @can(['view contact'])
-        @endcan    --}}
     </ul>
 </aside>
