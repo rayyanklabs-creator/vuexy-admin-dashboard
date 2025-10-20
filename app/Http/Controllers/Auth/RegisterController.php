@@ -51,20 +51,27 @@ class RegisterController extends Controller
         if ($validate->fails()) {
             return Redirect::back()->withErrors($validate)->withInput($request->all())->with('error', 'Validation Error!');
         }
-
         try {
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = Hash::make($request->password);
-            $user->username = $this->generateUsername($request->name);
-            $user->save();
+            DB::transaction(function () use ($request) {
+                $user = new User();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->password = Hash::make($request->password);
+                $user->username = $this->generateUsername($request->name);
+                $user->save();
 
-            $user->syncRoles(User::USER);
+                $user->syncRoles(User::USER);
 
-            Auth::attempt(['email' => $request->email, 'password' => $request->password]);
+                $profile = new Profile();
+                $profile->user_id = $user->id;
+                $profile->first_name = $request->name;
+                $profile->save();
+
+                Auth::attempt(['email' => $request->email, 'password' => $request->password]);
+            });
             return redirect()->route('login')->with('success', 'Your account has been created successfully.');
         } catch (\Throwable $th) {
+            DB::rollBack();
             Log::error('User registration failed', ['error' => $th->getMessage()]);
             return redirect()->back()->withInput($request->all())->with('error', "Something went wrong! Please try again later");
         }

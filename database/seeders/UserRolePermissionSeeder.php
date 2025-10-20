@@ -31,6 +31,11 @@ class UserRolePermissionSeeder extends Seeder
         Permission::create(['name' => 'create user']);
         Permission::create(['name' => 'delete user']);
 
+        Permission::create(['name' => 'view archived user']);
+        Permission::create(['name' => 'create archived user']);
+        Permission::create(['name' => 'update archived user']);
+        Permission::create(['name' => 'delete archived user']);
+
 
         $superAdminRole = Role::create(['name' => 'super-admin']);
         $adminRole = Role::create(['name' => 'admin']);

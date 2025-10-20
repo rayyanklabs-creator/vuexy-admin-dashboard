@@ -36,25 +36,51 @@
                 <i class="menu-icon tf-icons ti ti-shield-lock"></i>
                 <div>{{ __('Roles & Permissions') }}</div>
             </a>
-            
-            @canany(['view role', 'view permission'])
+
+        @canany(['view role', 'view permission'])
+            <ul class="menu-sub">
+                @can(['view role'])
+                    <li class="menu-item {{ request()->routeIs('dashboard.roles.*') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard.roles.index') }}" class="menu-link">
+                            <div>{{ __('Roles') }}</div>
+                        </a>
+                    </li>
+                @endcan
+                @can(['view permission'])
+                    <li class="menu-item {{ request()->routeIs('dashboard.permissions.*') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard.permissions.index') }}" class="menu-link">
+                            <div>{{ __('Permissions') }}</div>
+                        </a>
+                    </li>
+                @endcan
+            </ul>
+        @endcan
+
+          @canany(['view user', 'view archived user'])
+            <li
+                class="menu-item {{ request()->routeIs('dashboard.user.*') || request()->routeIs('dashboard.archived-user.*') ? 'open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ti ti-users"></i>
+                    <div>{{ __('Users') }}</div>
+                </a>
                 <ul class="menu-sub">
-                    @can(['view role'])
-                        <li class="menu-item {{ request()->routeIs('dashboard.roles.*') ? 'active' : '' }}">
-                            <a href="{{ route('dashboard.roles.index') }}" class="menu-link">
-                                <div>{{ __('Roles') }}</div>
+                    @can(['view user'])
+                        <li class="menu-item {{ request()->routeIs('dashboard.user.*') ? 'active' : '' }}">
+                            <a href="{{route('dashboard.user.index')}}" class="menu-link">
+                                <div>{{ __('All Users') }}</div>
                             </a>
                         </li>
                     @endcan
-                    @can(['view permission'])
-                        <li class="menu-item {{ request()->routeIs('dashboard.permissions.*') ? 'active' : '' }}">
-                            <a href="{{ route('dashboard.permissions.index') }}" class="menu-link">
-                                <div>{{ __('Permissions') }}</div>
+                    @can(['view archived user'])
+                        <li class="menu-item {{ request()->routeIs('dashboard.archived-user.*') ? 'active' : '' }}">
+                            <a href="{{ route('dashboard.archived-user.index') }}" class="menu-link">
+                                <div>{{ __('Archived Users') }}</div>
                             </a>
                         </li>
                     @endcan
                 </ul>
-            @endcan
+            </li>
+        @endcan
         </li>
     </ul>
 </aside>

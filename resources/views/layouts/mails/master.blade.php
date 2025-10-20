@@ -109,7 +109,7 @@
 
     <div class="email-container">
         <div class="email-header">
-            <a href="{{route('frontend.home')}}" class="app-brand auth-cover-brand">
+            <a href="#" class="app-brand auth-cover-brand">
                 {{-- <span class="app-brand-logo demo">
                     <img src="{{ asset(\App\Helpers\Helper::getLogoLight()) }}" alt="{{\App\Helpers\Helper::getCompanyName()}}">
                 </span> --}}

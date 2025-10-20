@@ -18,6 +18,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /** Declaring the const */
 
     public const USER = 'user';
+    public const ADMIN = 'admin';
+    public const SUPER_ADMIN = 'super-admin';
+
 
     /**
      * The attributes that are mass assignable.

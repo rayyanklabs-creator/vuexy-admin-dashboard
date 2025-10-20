@@ -6,10 +6,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\RolePermission\PermissionController;
 use App\Http\Controllers\Dashboard\RolePermission\RoleController;
+use App\Http\Controllers\Dashboard\User\ArchivedUserController;
+use App\Http\Controllers\Dashboard\User\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-
 
 Auth::routes();
 Route::group(['middleware' => ['guest']], function () {
@@ -34,11 +34,14 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
-
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
-
+        // User Routes
+        Route::resource('user', UserController::class);
+        Route::resource('archived-user', ArchivedUserController::class);
+        Route::get('user/restore/{id}', [ArchivedUserController::class, 'restoreUser'])->name('archived-user.restore');
+        Route::get('user/status/{id}', [UserController::class, 'updateStatus'])->name('user.status.update');
+        // Role and Permission Routes
         Route::resource('permissions', PermissionController::class);
         Route::resource('roles', RoleController::class);
     });

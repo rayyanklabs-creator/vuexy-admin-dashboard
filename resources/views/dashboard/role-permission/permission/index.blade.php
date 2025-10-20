@@ -2,59 +2,71 @@
 
 @section('title', __('Permissions'))
 
-@section('css')
-@endsection
-
 
 @section('breadcrumb-items')
-    <li class="breadcrumb-item active">{{ __('Permissions') }}</li>
+    <li class="breadcrumb-item active">{{ __('Permission') }}</li>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-datatable table-responsive">
-            <table class="datatables-permissions table border-top custom-datatables">
-                <thead>
+<div class="card">
+    <div class="card-body">
+
+        @foreach($groupedPermissions as $moduleName => $modulePermissions)
+        <!-- Dynamic Permission Section -->
+        <h5 class="mt-4 mb-3 fw-bold text-primary border-bottom pb-2">
+            {{ $moduleName }}
+        </h5>
+
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered align-middle text-center table-hover">
+                <thead class="table-light">
                     <tr>
-                        <th></th>
-                        <th>{{ __('Sr.') }}</th>
                         <th>{{ __('Name') }}</th>
-                        <th>{{ __('Assigned To') }}</th>
-                        <th>{{ __('Created Date') }}</th>
-                        {{-- <th>Actions</th> --}}
+                        <th >{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($permissions as $index => $permission)
+                    @foreach($modulePermissions as $permissionData)
+                        @php
+                            $permission = $permissionData['permission'];
+                        @endphp
                         <tr>
-                            <td></td>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $permission->name }}</td>
-                            <td>
-                                @if ($permission->roles->isNotEmpty())
-                                    @foreach ($permission->roles as $role)
-                                        <span class="badge me-4 bg-label-primary">{{ Str::title(str_replace('-', ' ', $role->name)) }}</span>
-                                    @endforeach
-                                @else
-                                    <span class="badge bg-secondary">{{ __('No Roles Assigned') }}</span>
-                                @endif
+                            <td class="text-start">
+                                <span class="fw-semibold">{{ $permission->name }}</span>
                             </td>
-                            <td>{{ $permission->created_at->format('Y-m-d') }}</td>
-                            {{-- <td>
-                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPermissionModal">
-                                    Edit
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-permission" data-id="{{ $permission->id }}">
-                                    Delete
-                                </button>
-                            </td> --}}
+    
+                            <td>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <form action="#" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Are you sure to delete this permission?')"
+                                                title="Delete Permission">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-    </div>
-@endsection
+        @endforeach
 
-@section('script')
+        @if(empty($groupedPermissions))
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <i class="bx bx-shield-x bx-lg text-muted"></i>
+            </div>
+            <h5 class="text-muted">No Permissions Found</h5>
+            <p class="text-muted">There are no permissions configured in the system.</p>
+        </div>
+        @endif
+
+    </div>
+</div>
 @endsection

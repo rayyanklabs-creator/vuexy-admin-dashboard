@@ -11443,7 +11443,7 @@ div:not(.nav-align-left):not(.nav-align-right) > .nav-tabs {
 }
 
 .invalid-feedback {
-  display: none;
+  /* display: none; */
   width: 100%;
   margin-top: 0.25rem;
   font-size: 0.8125rem;
