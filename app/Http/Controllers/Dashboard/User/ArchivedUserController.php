@@ -39,8 +39,6 @@ class ArchivedUserController extends Controller
             $user->forceDelete();
             return redirect()->route('dashboard.archived-user.index')->with('success', 'User Permanently Deleted Successfully');
         } catch (\Throwable $th) {
-            // Handle the exception
-            // throw $th;
             Log::error("Archived User destroy Failed:" . $th->getMessage());
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
         }
