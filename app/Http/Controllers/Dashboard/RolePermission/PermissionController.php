@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard\RolePermission;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
 
@@ -18,26 +19,16 @@ class PermissionController extends Controller
     {
         try {
         $this->authorize('view permission');
-        $permissions = Permission::with('roles')->get();
+        $permissions = Permission::with('roles')->get()->groupBy(function($item){
+            return explode(' ', trim($item->name),2)[1];
+        });
 
-        $groupedPermissions = [];
-        foreach ($permissions as $permission) {
-            $moduleName = $this->extractModuleName($permission->name);
-            $groupedPermissions[$moduleName][] = ['permission' => $permission];
-        }
-
-        return view('dashboard.role-permission.permission.index', compact('permissions', 'groupedPermissions'));
+        // dd($permissions);
+        return view('dashboard.role-permission.permission.index', compact('permissions'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
         }
     }
 
-    private function extractModuleName($permissionName)
-    {
-        $parts = explode(' ', $permissionName);
-        if (count($parts) > 1) {
-            return ucfirst($parts[1]); 
-        }
-        return ucfirst($permissionName); 
-    }
+    public function store(Request $request) {}
 }
