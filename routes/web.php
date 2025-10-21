@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('user/restore/{id}', [ArchivedUserController::class, 'restoreUser'])->name('archived-user.restore');
         Route::get('user/status/{id}', [UserController::class, 'updateStatus'])->name('user.status.update');
         // Role and Permission Routes
+        // Route::resource('permissions', PermissionController::class);
         Route::resource('permissions', PermissionController::class);
         Route::resource('roles', RoleController::class);
     });

@@ -15,7 +15,7 @@
             <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{{ __('Permissions') }}</h4>
                 @can('create permission')
-                    <a class="btn btn-primary" href="{{ route('dashboard.permissions.create') }}">{{ __('Create') }}</a>
+                    <button class="btn add-new btn-primary" data-bs-target="#addPermissionModal" data-bs-toggle="modal"><span><i class="menu-icon tf-icons ti ti-plus"></i><span class="d-none d-sm-inline-block">{{ __('Add Permission') }}</span></span></button>
                 @endcan
             </div>
 
@@ -109,12 +109,12 @@
         </div>
 
     <!-- Add Role Modal -->
-    {{-- @include('dashboard.role-permission.permission.sections.add-modal') --}}
+    @include('dashboard.role-permission.permission.sections.add-modal')
 @endsection
 
 @section('script')
     <script src="{{ asset('assets/js/modal-add-permission.js') }}"></script>
-    <script src="{{ asset('assets/js/modal-edit-permission.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/modal-edit-permission.js') }}"></script> --}}
     <script>
         $(document).ready(function() {
             setTimeout(function() {
