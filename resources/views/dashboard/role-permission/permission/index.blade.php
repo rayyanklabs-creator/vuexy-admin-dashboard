@@ -3,6 +3,16 @@
 @section('title', 'Permission')
 
 @section('css')
+    <style>
+        .edit-loader {
+            width: 100%;
+        }
+
+        .edit-loader .sk-chase {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 @endsection
 
 @section('breadcrumb-items')
@@ -68,12 +78,13 @@
                                         <td>
                                             <div class="d-flex justify-content-center gap-2">
                                                 @can('update permission')
-                                                    <a href="{{ route('dashboard.permissions.edit', $permission->id) }}"
+                                                    <button
                                                         class="btn btn-icon btn-text-primary waves-effect waves-light rounded-pill"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        data-bs-target="#editPermissionModal" data-bs-toggle="modal"
+                                                        data-permission-id="{{ $permission->id }}"
                                                         title="{{ __('Edit Permission') }}">
                                                         <i class="ti ti-pencil ti-md"></i>
-                                                    </a>
+                                                    </button>
                                                 @endcan
 
                                                 @can('delete permission')
@@ -110,7 +121,7 @@
         <!-- Add Permission Modal -->
         @include('dashboard.role-permission.permission.sections.add-modal')
         <!--/ Add Permission Modal -->
-    
+
         <!-- Edit Role Modal -->
         @include('dashboard.role-permission.permission.sections.edit-modal')
         <!-- / Edit Role Modal -->
@@ -124,6 +135,36 @@
                 setTimeout(function() {
                     $('.dataTables_paginate').hide();
                 }, 300);
+            });
+        </script>
+
+        <script>
+            $(document).ready(function() {
+                $('.edit-loader').hide();
+                $('#edit-permission-modal').hide();
+
+                $('#editPermissionModal').on('show.bs.modal', function(event) {
+                    $('.edit-loader').show();
+                    $('#edit-permission-modal').hide();
+                    var button = $(event.relatedTarget);
+                    var permissionId = button.data('permission-id');
+                    fetchPermissionData(permissionId);
+                });
+
+                var editPermissionRoute = "{{ route('dashboard.permissions.edit', ':permissionId') }}";
+                var updatePermissionRoute = "{{ route('dashboard.permissions.update', ':permissionId') }}";
+
+                function fetchPermissionData(permissionId) {   
+                    var url = editPermissionRoute.replace(':permissionId', permissionId);
+                    $.ajax({
+                        url: url,   
+                        type: 'GET',
+                        success: function(data) {
+                            var permission = data.permission;
+                            console.log("AJAX RUN SUCESSFULLY", permission);
+                        }
+                    });
+                }
             });
         </script>
     @endsection
