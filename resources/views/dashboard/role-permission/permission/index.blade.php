@@ -15,7 +15,9 @@
             <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{{ __('Permissions') }}</h4>
                 @can('create permission')
-                    <button class="btn add-new btn-primary" data-bs-target="#addPermissionModal" data-bs-toggle="modal"><span><i class="menu-icon tf-icons ti ti-plus"></i><span class="d-none d-sm-inline-block">{{ __('Add Permission') }}</span></span></button>
+                    <button class="btn add-new btn-primary" data-bs-target="#addPermissionModal" data-bs-toggle="modal"><span><i
+                                class="menu-icon tf-icons ti ti-plus"></i><span
+                                class="d-none d-sm-inline-block">{{ __('Add Permission') }}</span></span></button>
                 @endcan
             </div>
 
@@ -104,22 +106,24 @@
                     </div>
                 @endforelse
             </div>
-
-            
         </div>
+        <!-- Add Permission Modal -->
+        @include('dashboard.role-permission.permission.sections.add-modal')
+        <!--/ Add Permission Modal -->
+    
+        <!-- Edit Role Modal -->
+        @include('dashboard.role-permission.permission.sections.edit-modal')
+        <!-- / Edit Role Modal -->
+    @endsection
 
-    <!-- Add Role Modal -->
-    @include('dashboard.role-permission.permission.sections.add-modal')
-@endsection
-
-@section('script')
-    <script src="{{ asset('assets/js/modal-add-permission.js') }}"></script>
-    {{-- <script src="{{ asset('assets/js/modal-edit-permission.js') }}"></script> --}}
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.dataTables_paginate').hide();
-            }, 300);
-        });
-    </script>
-@endsection
+    @section('script')
+        <script src="{{ asset('assets/js/modal-add-permission.js') }}"></script>
+        <script src="{{ asset('assets/js/modal-edit-permission.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+                setTimeout(function() {
+                    $('.dataTables_paginate').hide();
+                }, 300);
+            });
+        </script>
+    @endsection
