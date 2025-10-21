@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   (function () {
     FormValidation.formValidation(document.getElementById('addPermissionForm'), {
       fields: {
-        modalPermissionName: {
+        permission_name: {
           validators: {
             notEmpty: {
               message: 'Please enter permission name'
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }),
         submitButton: new FormValidation.plugins.SubmitButton(),
         // Submit the form when all fields are valid
-        // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
         autoFocus: new FormValidation.plugins.AutoFocus()
       }
     });
