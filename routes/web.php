@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\RolePermission\PermissionController;
 use App\Http\Controllers\Dashboard\RolePermission\RoleController;
 use App\Http\Controllers\Dashboard\User\ArchivedUserController;
 use App\Http\Controllers\Dashboard\User\UserController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -50,4 +51,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('roles', RoleController::class);
         });
     });
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/clear-cache', function () {
+        Artisan::call('cache:clear');
+        return "Application cache cleared!";
+    })->name('clear.cache');
+
+    Route::get('/clear-config', function () {
+        Artisan::call('config:clear');
+        return "Configuration cache cleared!";
+    })->name('clear.config');
+
+    Route::get('/clear-view', function () {
+        Artisan::call('view:clear');
+        return "View cache cleared!";
+    })->name('clear.view');
+
+    Route::get('/clear-route', function () {
+        Artisan::call('route:clear');
+        return "Route cache cleared!";
+    })->name('clear.route');
+
+    Route::get('/clear-optimize', function () {
+        Artisan::call('optimize:clear');
+        return "Optimization cache cleared!";
+    })->name('clear.optimize');
 });
