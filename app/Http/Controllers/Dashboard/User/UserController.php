@@ -30,7 +30,8 @@ class UserController extends Controller
 
         try {
             $stats = $this->userService->getUserStats();
-            return view('dashboard.users.index',  $stats);
+            $roles = $this->userService->getRole();
+            return view('dashboard.users.index', compact('roles') + $stats);
         } catch (\Throwable $th) {
             Log::error("User Index Failed:" . $th->getMessage());
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
@@ -108,7 +109,7 @@ class UserController extends Controller
         }
 
         try {
-            $user = $this->userService->getUsersQueryForWeb(['profile'])->findOrFail($id);
+            $user = $this->userService->getUsers($id, ['profile']);
             return response()->json([
                 'success' => true,
                 'user' => $this->userService->formatUserData($user),
@@ -143,7 +144,7 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($id, $request) {
-                $user = $this->userService->getUsersQueryForWeb(null)->findOrFail($id);
+                $user = $this->userService->getUsers($id, null);
                 $user->name = $request->edit_first_name . ' ' . $request->edit_last_name;
                 $user->save();
 
@@ -172,7 +173,7 @@ class UserController extends Controller
         $this->authorize('delete user');
 
         try {
-            $user = $this->userService->getUsersQueryForWeb(null)->findOrFail($id);
+            $user = $this->userService->getUsers($id, null);
             $user->delete();
 
             return redirect()->back()->with('success', 'Account Deleted Successfully');
@@ -192,7 +193,7 @@ class UserController extends Controller
         $this->authorize('update user');
 
         try {
-            $user = $this->userService->getUsersQueryForWeb([])->findOrFail($id);
+            $user = $this->userService->getUsers($id, null);
             $message = $user->is_active == 'active' ? 'Account Deactivated Successfully' : 'Account Activated Successfully';
 
             $user->is_active = $user->is_active == 'active' ? 'inactive' : 'active';

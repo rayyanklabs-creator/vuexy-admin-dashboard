@@ -41,7 +41,7 @@ class UserService extends BaseService
         'github_url'
     ];
 
-    const loadRelation = ['profile', 'roles'];
+    const loadRelation = ['profile'];
 
     public function getBasicQuery()
     {
@@ -72,15 +72,16 @@ class UserService extends BaseService
 
     public function getUsers($userIds = null, $relations = [])
     {
-
+        
+        $relations = is_array($relations) ? $relations : [];
         $query = $this->getBasicQuery()->select(self::defaultSelect);
         $query = $this->getUsersQueryForWeb($relations)->select(self::defaultSelect);
 
         if ($userIds) {
             if (is_array($userIds) || $userIds instanceof Collection) {
-                $query->whereIn('id', (array) $userIds);
+                return $query->whereIn('id', (array) $userIds);
             } else {
-                $query->where('id', $userIds);
+                return  $query->findOrFail($userIds);
             }
         }
 
@@ -173,5 +174,9 @@ class UserService extends BaseService
             'totalActiveUsers' => $this->getBasicQuery()->where('is_active', 'active')->count(),
             'totalArchivedUsers' => $this->getBasicQuery()->onlyTrashed()->count(),
         ];
+    }
+
+    public function getRole(){
+        return Role::all();
     }
 }
