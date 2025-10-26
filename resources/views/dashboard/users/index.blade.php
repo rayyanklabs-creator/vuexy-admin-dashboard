@@ -3,6 +3,7 @@
 @section('title', __('Users'))
 
 @section('css')
+
     <style>
         .edit-loader {
             width: 100%;
@@ -13,19 +14,18 @@
             margin: 0 auto;
         }
 
-        .modal-card{
-            background: transparent !important; 
-            border: none !important; 
+        .modal-card {
+            background: transparent !important;
+            border: none !important;
             box-shadow: none !important;
         }
     </style>
 @endsection
 
-
 @section('breadcrumb-items')
     <li class="breadcrumb-item active">{{ __('Users') }}</li>
 @endsection
-{{-- @dd($totalArchivedUsers) --}}
+
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <div class="row g-6 mb-6">
@@ -118,7 +118,8 @@
                 @canany(['create user'])
                     <button class="add-new btn btn-primary waves-effect waves-light" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasAddUser">
-                        <i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">{{ __('Add New User') }}</span>
+                        <i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span
+                            class="d-none d-sm-inline-block">{{ __('Add New User') }}</span>
                     </button>
                 @endcan
             </div>
@@ -133,70 +134,12 @@
                             <th>{{ __('Role') }}</th>
                             <th>{{ __('Created Date') }}</th>
                             <th>{{ __('Status') }}</th>
-                            @canany(['delete user', 'update user', 'view user'])<th>{{ __('Action') }}</th>@endcan
+                            @canany(['delete user', 'update user', 'view user'])<th class="">{{ __('Action') }}</th>
+                            @endcan
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $index => $user)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ Str::title(str_replace('-', ' ', $user->getRoleNames()->first())) }}</td>
-                                <td>{{ $user->created_at->format('Y-m-d') }}</td>
-                                <td>
-                                    <span
-                                        class="badge me-4 bg-label-{{ $user->is_active == 'active' ? 'success' : 'danger' }}">{{ ucfirst($user->is_active) }}</span>
-                                </td>
-                                @canany(['delete user', 'update user', 'view user'])
-                                    <td class="d-flex">
-                                        @canany(['delete user'])
-                                            @if (!($user->getRoleNames()->first() == 'admin' || $user->getRoleNames()->first() == 'super-admin'))
-                                                <form action="{{ route('dashboard.user.destroy', $user->id) }}" method="POST">
-                                                    @method('DELETE')
-                                                    @csrf
-                                                    <a href="#" type="submit"
-                                                        class="btn btn-icon btn-text-danger waves-effect waves-light rounded-pill delete-record delete_confirmation"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Archive User') }}">
-                                                        <i class="ti ti-trash ti-md"></i>
-                                                    </a>
-                                                </form>
-                                            @endif
-                                        @endcan
-                                        @canany(['update user'])
-                                            <span class="text-nowrap">
-                                                <button
-                                                    class="btn btn-icon btn-text-primary waves-effect waves-light rounded-pill me-1"
-                                                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditUser"
-                                                    data-user-id="{{ $user->id }}">
-                                                    <i class="ti ti-edit ti-md"></i>
-                                                </button>
-                                            </span>
-                                            <span class="text-nowrap">
-                                                <a href="{{ route('dashboard.user.status.update', $user->id) }}"
-                                                    class="btn btn-icon btn-text-primary waves-effect waves-light rounded-pill me-1"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="{{ $user->is_active == 'active' ? __('Deactivate User') : __('Activate User') }}">
-                                                    @if ($user->is_active == 'active')
-                                                        <i class="ti ti-toggle-right ti-md text-success"></i>
-                                                    @else
-                                                        <i class="ti ti-toggle-left ti-md text-danger"></i>
-                                                    @endif
-                                                </a>
-                                            </span>
-                                        @endcan
-                                        @can(['view user'])
-                                            <button class="btn btn-icon btn-text-warning waves-effect waves-light rounded-pill me-1"
-                                                data-bs-toggle="modal" data-bs-target="#modalCenter"
-                                                data-user-id="{{ $user->id }}">
-                                                <i class="ti ti-eye ti-md"></i>
-                                            </button>
-                                        @endcan
-                                    </td>
-                                @endcan
-                            </tr>
-                        @endforeach
+
                     </tbody>
                 </table>
             </div>
@@ -212,12 +155,27 @@
     @endcan
 @endsection
 
+
 @section('script')
     <script>
         $(document).ready(function() {
             $('.edit-loader').hide();
             $('#editUserForm').show();
-            // Event listener for edit modal opening
+
+            $(document).on('click', '.btn-edit-user', function() {
+                $('.edit-loader').show();
+                $('#editUserForm').hide();
+                var userId = $(this).data('user-id');
+                fetchUserData(userId, 'edit');
+            });
+
+            $(document).on('click', '.btn-view-user', function() {
+                $('.edit-loader').show();
+                $('#user-info').hide();
+                var userId = $(this).data('user-id');
+                fetchUserData(userId, 'view');
+            });
+
             $('#offcanvasEditUser').on('show.bs.offcanvas', function(event) {
                 $('.edit-loader').show();
                 $('#editUserForm').hide();
@@ -225,6 +183,7 @@
                 var userId = button.data('user-id');
                 fetchUserData(userId, 'edit');
             });
+
             $('#modalCenter').on('show.bs.modal', function(event) {
                 $('.edit-loader').show();
                 $('#user-info').hide();
@@ -232,6 +191,7 @@
                 var userId = button.data('user-id');
                 fetchUserData(userId, 'view');
             });
+
             var editUserRoute = "{{ route('dashboard.user.edit', ':userId') }}";
             var updateUserRoute = "{{ route('dashboard.user.update', ':userId') }}";
 
@@ -243,9 +203,6 @@
                     success: function(data) {
                         if (data.success) {
                             var user = data.user;
-                            // // Check if it's the edit offcanvas or the view modal
-                            // var isEdit = $('#offcanvasEditUser').hasClass('show');
-                            // var isModal = $('#modalCenter').hasClass('show');
                             if (type == 'edit') {
                                 $('#edit_first_name').val(user.first_name);
                                 $('#edit_last_name').val(user.last_name);
@@ -254,72 +211,109 @@
 
                                 $('.edit-loader').hide();
                                 $('#editUserForm').show();
-                                // ✅ Set form action dynamically using the route variable
+
                                 var updateUrl = updateUserRoute.replace(':userId', user.id);
                                 $('#editUserForm').attr('action', updateUrl);
                             }
                             if (type == 'view') {
-                                // ✅ Update Modal User Info
-                                var profileImage = user.profile_image 
-                                    ? '{{ asset("") }}' + user.profile_image 
-                                    : '{{ asset("assets/img/default/user.png") }}';
+                                var profileImage = user.profile_image ?
+                                    '{{ asset('') }}' + user.profile_image :
+                                    '{{ asset('assets/img/default/user.png') }}';
                                 $('#user-info img').attr('src', profileImage);
                                 $('#user-info .user-info h5').text(user.full_name ? user.full_name :
                                     'N/A');
-                                $('#user-info .user-info span.badge').text(user.role ? user.role.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) :
+                                $('#user-info .user-info span.badge').text(user.role ? user.role
+                                    .replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) :
                                     'N/A');
 
                                 var userDetails = `
-                                    <li class="mb-2"><span class="h6">{{ __('Username') }}:</span> <span>${user.username ? user.username : 'N/A'}</span></li>
-                                    <li class="mb-2"><span class="h6">{{ __('Email') }}:</span> <span>${user.email ? user.email : 'N/A'}</span></li>
-                                    <li class="mb-2"><span class="h6">{{ __('Status') }}:</span> <span>${user.is_active ? user.is_active.replace(/\b\w/g, c => c.toUpperCase()) : 'Inactive'}</span></li>
-                                    <li class="mb-2"><span class="h6">{{ __('Contact') }}:</span> <span>${user.phone_number ? user.phone_number : 'N/A'}</span></li>
-                                    `;
+                                    <li class="mb-2"><span class="h6">{{ __('Username') }}:</span> <span>${user.username ? user.username :
+                                            'N/A'}</span></li>
+                                    <li class="mb-2"><span class="h6">{{ __('Email') }}:</span> <span>${user.email ? user.email : 'N/A'}</span>
+                                    </li>
+                                    <li class="mb-2"><span class="h6">{{ __('Status') }}:</span> <span>${user.is_active ?
+                                            user.is_active.replace(/\b\w/g, c => c.toUpperCase()) : 'Inactive'}</span></li>
+                                    <li class="mb-2"><span class="h6">{{ __('Contact') }}:</span> <span>${user.phone_number ? user.phone_number :
+                                            'N/A'}</span></li>`;
+
                                 $('#user-info .info-container ul').html(userDetails);
 
-                                // Update Social Media Links
                                 var socialLinks = '';
                                 if (user.facebook_url) {
-                                    socialLinks += `<a href="${user.facebook_url}" target="_blank" style="color: inherit;"><i class="fab fa-facebook fa-lg"></i></a>`;
+                                    socialLinks +=
+                                        `<a href="${user.facebook_url}" target="_blank" style="color: inherit;"><i class="fab fa-facebook fa-lg"></i></a>`;
                                 }
                                 if (user.linkedin_url) {
-                                    socialLinks += `<a href="${user.linkedin_url}" target="_blank" style="color: inherit;"><i class="fab fa-linkedin fa-lg"></i></a>`;
+                                    socialLinks +=
+                                        `<a href="${user.linkedin_url}" target="_blank" style="color: inherit;"><i class="fab fa-linkedin fa-lg"></i></a>`;
                                 }
                                 if (user.instagram_url) {
-                                    socialLinks += `<a href="${user.instagram_url}" target="_blank" style="color: inherit;"><i class="fab fa-instagram fa-lg"></i></a>`;
+                                    socialLinks +=
+                                        `<a href="${user.instagram_url}" target="_blank" style="color: inherit;"><i class="fab fa-instagram fa-lg"></i></a>`;
                                 }
                                 if (user.github_url) {
-                                    socialLinks += `<a href="${user.github_url}" target="_blank" style="color: inherit;"><i class="fab fa-github fa-lg"></i></a>`;
+                                    socialLinks +=
+                                        `<a href="${user.github_url}" target="_blank" style="color: inherit;"><i class="fab fa-github fa-lg"></i></a>`;
                                 }
-                                
-                                $('#modalSocialIcons').html(socialLinks); // Update social icons container
 
-                                console.log("dewd");
+                                $('#modalSocialIcons').html(socialLinks);
 
                                 $('.edit-loader').hide();
                                 $('#user-info').show();
                             }
-
                         }
                     },
                     error: function(xhr, status, error) {
                         $('.edit-loader').hide();
-                        $('#editUserForm').show();
-                        $('#user-info').show();
+                        if (type == 'edit') {
+                            $('#editUserForm').show();
+                        } else {
+                            $('#user-info').show();
+                        }
                         console.error('Error fetching user data:', error);
                     }
                 });
             }
 
             $("#addNewUserForm").on("submit", function() {
-                $("#addUserBtn").prop("disabled", true); // Disable button
-                $("#addUserLoader").removeClass("d-none"); // Show spinner
+                $("#addUserBtn").prop("disabled", true);
+                $("#addUserLoader").removeClass("d-none");
             });
 
             $("#editUserForm").on("submit", function() {
-                $("#editUserBtn").prop("disabled", true); // Disable button
-                $("#editUserLoader").removeClass("d-none"); // Show spinner
+                $("#editUserBtn").prop("disabled", true);
+                $("#editUserLoader").removeClass("d-none");
             });
+
+
+        });
+    </script>
+@endsection
+
+@section('data-table-script')
+    <script>
+        let userColumns = [
+            { data: 'sr_no', name: 'sr_no', orderable: false, searchable: false },
+            { data: 'name',  name: 'name', },
+            { data: 'username',name: 'username' },
+            { data: 'email', name: 'email' },
+            { data: 'role', name: 'role',  orderable: false},
+            { data: 'created_date', name: 'created_at'},
+            { data: 'status', name: 'status', render: function(data) { return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';}, orderable: false },
+            @canany(['delete user', 'update user', 'view user']) 
+            { data: 'actions', name: 'actions', orderable: false, searchable: false} 
+            @endcanany
+        ];
+
+        let userDataTable = initServerSideDataTable("{{ route('dashboard.user.data') }}", userColumns);
+
+        $(document).on('ajaxComplete', function(event, xhr, settings) {
+            if (settings.url.includes('user.update') || settings.url.includes('user.destroy') ||
+                settings.url.includes('user.store')) {
+                if (userDataTable) {
+                    userDataTable.ajax.reload(null, false);
+                }
+            }
         });
     </script>
 @endsection

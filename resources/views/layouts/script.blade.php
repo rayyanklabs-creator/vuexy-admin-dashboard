@@ -34,9 +34,11 @@
 <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
 <script src="{{ asset('assets/js/extended-ui-sweetalert2.js') }}"></script>
 
-<script src="{{asset('assets/js/forms-selects.js')}}"></script>
-@yield('script')
+<script src="{{ asset('assets/js/forms-selects.js') }}"></script>
+<script src="{{ asset('assets/js/datatables-init.js') }}"></script>
 
+@yield('script')
+@yield('data-table-script')
 <script>
     $(document).ready(function() {
         $(document).on('click', '.copy-icon', function() {
@@ -56,100 +58,23 @@
                 tooltipInstance.dispose(); // Destroy tooltip to update title
             }
 
-            $this.attr('title', '{{__("Copied")}}'); // Update title
+            $this.attr('title', '{{ __('Copied') }}'); // Update title
             $this.tooltip({
                 trigger: 'manual'
             }).tooltip('show'); // Show updated tooltip
 
             // Reset tooltip after 1.5 seconds
             setTimeout(() => {
-                $this.tooltip('hide').attr('title', '{{__("Copy")}}').tooltip();
+                $this.tooltip('hide').attr('title', '{{ __('Copy') }}').tooltip();
             }, 1500);
         });
-        $(function() {
-            var dtTable = $('.custom-datatables'),
-                dt;
-            if (dtTable.length) {
-                dt = dtTable.DataTable({
-                    dom: '<"row"' +
-                        '<"col-md-2"<l>>' +
-                        '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-6 mb-md-0"fB>>' +
-                        '>t' +
-                        '<"row"' +
-                        '<"col-sm-12 col-md-6"i>' +
-                        '<"col-sm-12 col-md-6"p>' +
-                        '>',
-                    language: {
-                        sLengthMenu: 'Show _MENU_',
-                        search: '',
-                        searchPlaceholder: 'Search...',
-                        paginate: {
-                            next: '<i class="ti ti-chevron-right ti-sm"></i>',
-                            previous: '<i class="ti ti-chevron-left ti-sm"></i>'
-                        }
-                    },
-                    buttons: [{
-                        extend: 'collection',
-                        className: 'btn btn-label-secondary dropdown-toggle me-4 waves-effect waves-light border-left-0 border-right-0 rounded',
-                        text: '<i class="ti ti-upload ti-xs me-sm-1 align-text-bottom"></i> <span class="d-none d-sm-inline-block">{{__("Export")}}</span>',
-                        buttons: [{
-                                extend: 'print',
-                                text: '<i class="ti ti-printer me-1"></i>{{__("Print")}}',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':not(:last-child)' // Exclude the last column (Actions)
-                                }
-                            },
-                            {
-                                extend: 'csv',
-                                text: '<i class="ti ti-file-text me-1"></i>{{__("Csv")}}',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':not(:last-child)' // Exclude the last column (Actions)
-                                }
-                            },
-                            {
-                                extend: 'excel',
-                                text: '<i class="ti ti-file-spreadsheet me-1"></i>{{__("Excel")}}',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':not(:last-child)' // Exclude the last column (Actions)
-                                }
-                            },
-                            {
-                                extend: 'pdf',
-                                text: '<i class="ti ti-file-description me-1"></i>{{__("Pdf")}}',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':not(:last-child)' // Exclude the last column (Actions)
-                                }
-                            },
-                            {
-                                extend: 'copy',
-                                text: '<i class="ti ti-copy me-1"></i>{{__("Copy")}}',
-                                className: 'dropdown-item',
-                                exportOptions: {
-                                    columns: ':not(:last-child)' // Exclude the last column (Actions)
-                                }
-                            }
-                        ]
-                    }],
 
-                });
-            }
-
-            setTimeout(() => {
-                $('.dataTables_filter .form-control').removeClass('form-control-sm');
-                $('.dataTables_length .form-select').removeClass('form-select-sm');
-            }, 300);
-            $('.dataTables_filter').addClass('ms-n4 me-4 mt-0 mt-md-6');
-        });
     });
 </script>
 <script>
     @if (Session::has('success'))
         Swal.fire({
-            title: '{{__("Success!")}}',
+            title: '{{ __('Success!') }}',
             text: "{{ __(Session::get('success')) }}",
             icon: 'success',
             timer: 2000,
@@ -159,7 +84,7 @@
 
     @if (Session::has('message'))
         Swal.fire({
-            title: '{{__("Info!")}}',
+            title: '{{ __('Info!') }}',
             text: "{{ __(Session::get('message')) }}",
             icon: 'info',
             timer: 2000,
@@ -169,7 +94,7 @@
 
     @if (Session::has('error'))
         Swal.fire({
-            title: '{{__("Error!")}}',
+            title: '{{ __('Error!') }}',
             text: "{{ __(Session::get('error')) }}",
             icon: 'error',
             timer: 2000,
@@ -182,12 +107,12 @@
         event.preventDefault();
         var form = $(this).closest("form");
         Swal.fire({
-            title: '{{__("Are you sure?")}}',
-            text: '{{__("You would not be able to revert this!")}}',
+            title: '{{ __('Are you sure?') }}',
+            text: '{{ __('You would not be able to revert this!') }}',
             icon: 'warning',
             showCancelButton: true,
-            cancelButtonText: '{{__("Cancel")}}',
-            confirmButtonText: '{{__("Yes, delete it!")}}',
+            cancelButtonText: '{{ __('Cancel') }}',
+            confirmButtonText: '{{ __('Yes, delete it!') }}',
             customClass: {
                 confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
                 cancelButton: 'btn btn-label-secondary waves-effect waves-light'

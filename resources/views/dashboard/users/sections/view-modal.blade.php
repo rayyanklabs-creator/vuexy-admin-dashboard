@@ -16,8 +16,8 @@
                         <div class="sk-chase-dot"></div>
                     </div>
                 </div>
-                <div class="card mb-6 modal-card" id="user-info">
-                    <div class="card-body pt-12">
+                <div class="card  modal-card" id="user-info">
+                    <div class="card-body ">
                         <div class="user-avatar-section">
                             <div class="d-flex align-items-center flex-column">
                                 <img class="img-fluid rounded mb-4" src="{{asset('assets/img/default/user.png')}}"
@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-around flex-wrap my-6 gap-0 gap-md-3 gap-lg-4">
+                        <div class="d-flex justify-content-around flex-wrap my-3 gap-0 gap-md-3 gap-lg-4">
                             <div class="d-flex align-items-center gap-4" id="modalSocialIcons">
                             </div>
                         </div>

@@ -3,15 +3,16 @@
 @section('title', __('Archived Users'))
 
 @section('css')
-<style>
-    .edit-loader {
-        width: 100%;
-    }
-    .edit-loader .sk-chase {
-        display: block;
-        margin: 0 auto;
-    }
-</style>
+    <style>
+        .edit-loader {
+            width: 100%;
+        }
+
+        .edit-loader .sk-chase {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 @endsection
 
 
@@ -33,11 +34,12 @@
                             <th>{{ __('Role') }}</th>
                             <th>{{ __('Deletion Date') }}</th>
                             <th>{{ __('Status') }}</th>
-                            @canany(['delete archived user', 'restore archived user'])<th>{{ __('Action') }}</th>@endcan
+                            @canany(['delete archived user', 'restore archived user'])<th class="d-inline-flex">
+                                {{ __('Action') }}</th>@endcan
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($archivedUsers as $index => $user)
+                        {{-- @foreach ($archivedUsers as $index => $user)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $user->name }}</td>
@@ -71,7 +73,7 @@
                                     </td>
                                 @endcan
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
                 </table>
             </div>
@@ -80,6 +82,61 @@
 @endsection
 
 @section('script')
+    <script></script>
+@endsection
+@section('data-table-script')
     <script>
+        let archivedColumns = [{
+                data: 'sr_no',
+                name: 'sr_no',
+                orderable: false,
+                searchable: false
+            },
+            {
+                data: 'name',
+                name: 'name',
+            },
+            {
+                data: 'email',
+                name: 'email'
+            },
+            {
+                data: 'role',
+                name: 'role',
+                orderable: false
+            },
+            {
+                data: 'deleted_at',
+                name: 'deleted_at'
+            },
+            {
+                data: 'status',
+                name: 'status',
+                render: function(data) {
+                    return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';
+                },
+                orderable: false
+            },
+            @canany(['delete archived user', 'update archived user', 'view archived user'])
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                }
+            @endcanany
+        ];
+
+
+        let archivedUserDataTable = initServerSideDataTable("{{ route('dashboard.archived-user.data') }}",
+        archivedColumns);
+
+        $(document).on('ajaxComplete', function(event, xhr, settings) {
+            if (settings.url.includes('archived-user.update') || settings.url.includes('archived-user.destroy')) {
+                if (userDataTable) {
+                    userDataTable.ajax.reload(null, false);
+                }
+            }
+        });
     </script>
 @endsection
