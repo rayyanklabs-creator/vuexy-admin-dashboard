@@ -154,10 +154,10 @@
                 var editPermissionRoute = "{{ route('dashboard.permissions.edit', ':permissionId') }}";
                 var updatePermissionRoute = "{{ route('dashboard.permissions.update', ':permissionId') }}";
 
-                function fetchPermissionData(permissionId) {   
+                function fetchPermissionData(permissionId) {
                     var url = editPermissionRoute.replace(':permissionId', permissionId);
                     $.ajax({
-                        url: url,   
+                        url: url,
                         type: 'GET',
                         success: function(data) {
                             var permission = data.permission;
@@ -166,5 +166,12 @@
                     });
                 }
             });
+        </script>
+    @endsection
+
+
+    @section('data-table-script')
+        <script>
+            initClientSideDataTable();
         </script>
     @endsection

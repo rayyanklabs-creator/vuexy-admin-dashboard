@@ -210,3 +210,9 @@
     
 
 @endsection
+
+@section('data-table-script')
+<script>
+    initClientSideDataTable();
+</script>
+@endsection
