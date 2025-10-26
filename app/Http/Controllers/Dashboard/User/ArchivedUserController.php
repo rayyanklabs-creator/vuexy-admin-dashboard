@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard\User;
-
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\UserService;
+use App\Services\ArchivedUserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,26 +11,39 @@ class ArchivedUserController extends Controller
 {
     use AuthorizesRequests;
 
-    protected $userService;
+    protected $archivedUserService;
 
-    public function __construct(UserService $userService)
+    public function __construct(ArchivedUserService $archivedUserService)
     {
-        $this->userService = $userService;
+        $this->archivedUserService = $archivedUserService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->authorize('view archived user');
 
         try {
-            $archivedUsers = $this->userService->getArchivedUsersQuery()->get();
-            return view('dashboard.users.archived.index', compact('archivedUsers'));
+            return view('dashboard.users.archived.index');
         } catch (\Throwable $th) {
             Log::error("Archived User Index Failed:" . $th->getMessage());
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
+        }
+    }
+
+
+    public function getArchivedUsersData(Request $request)
+    {
+        
+        $this->authorize('view archived user');
+
+        try {
+            $archivedUsers = $this->archivedUserService->getArchivedUsersForDataTablesServerSide($request);
+            return response()->json($archivedUsers);
+        } catch (\Throwable $th) {
+            Log::error("Get Archived Users Data Failed: " . $th->getMessage());
+            return response()->json(['error' => 'Server error'], 500);
         }
     }
 
@@ -44,7 +55,7 @@ class ArchivedUserController extends Controller
         $this->authorize('delete archived user');
 
         try {
-            $user = $this->userService->getArchivedUserById($id);
+            $user = $this->archivedUserService->getArchivedUserById($id);
             $user->forceDelete();
 
             return redirect()->route('dashboard.archived-user.index')->with('success', 'User Permanently Deleted Successfully');
@@ -54,14 +65,14 @@ class ArchivedUserController extends Controller
         }
     }
 
-     public function restoreUser($id)
+    public function restoreUser($id)
     {
         $this->authorize('update archived user');
-        
+
         try {
-            $user = $this->userService->getArchivedUserById($id);
+            $user = $this->archivedUserService->getArchivedUserById($id);
             $user->restore();
-            
+
             return redirect()->route('dashboard.archived-user.index')->with('success', 'User Restored Successfully');
         } catch (\Throwable $th) {
             Log::error("Archived User restore Failed:" . $th->getMessage());
