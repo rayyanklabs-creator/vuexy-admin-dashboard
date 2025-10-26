@@ -5,9 +5,13 @@ namespace App\Services;
 use App\Models\User;
 use App\trait\GenerateUsername;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
-class UserService
+
+class UserService extends BaseService
 {
     use GenerateUsername;
 
@@ -19,7 +23,8 @@ class UserService
         'is_active',
         'email_verified_at',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'deleted_at'
     ];
 
     const profileSelect = [
@@ -36,97 +41,97 @@ class UserService
         'github_url'
     ];
 
+    const loadRelation = ['profile', 'roles'];
+
     public function getBasicQuery()
     {
         return User::query();
     }
 
-    public function getUsersWithStatsQuery()
+    public function getUsersQueryForWeb($relations = [])
     {
-        return $this->getBasicQuery();
-    }
-
-    public function getUsersWithProfile($select = null, $profileSelect = null)
-    {
-        return $this->getBasicQuery()
-            ->select($select ?? self::defaultSelect)
-            ->with(['profile' => function($query) use ($profileSelect) {
-                $query->select($profileSelect ?? self::profileSelect);
-            }]);
-    }
-
-    public function getUserById($id, $withProfile = true)
-    {
+        $relations = is_array($relations) ? $relations : [];
         $query = $this->getBasicQuery();
-        
-        if ($withProfile) {
-            $query->with('profile');
+
+        if ($relations === 'all') {
+            $relations = self::loadRelation;
         }
-        
-        return $query->findOrFail($id);
-    }
 
-    public function getArchivedUsersQuery()
-    {
-        return $this->getBasicQuery()->onlyTrashed();
-    }
+        if (is_string($relations)) {
+            $relations = [$relations];
+        }
 
-    public function getArchivedUserById($id)
-    {
-        return $this->getBasicQuery()->withTrashed()->findOrFail($id);
-    }
+        $validRelations = array_intersect($relations, self::loadRelation);
 
-    public function getUserStats()
-    {
-        return [
-            'totalUsers' => $this->getBasicQuery()->count(),
-            'totalDeactivatedUsers' => $this->getBasicQuery()->where('is_active', 'inactive')->count(),
-            'totalActiveUsers' => $this->getBasicQuery()->where('is_active', 'active')->count(),
-            'totalUnverifiedUsers' => $this->getBasicQuery()->where('email_verified_at', null)->count(),
-            'totalArchivedUsers' => $this->getBasicQuery()->onlyTrashed()->count(),
-        ];
-    }
-
-    public function getRoles()
-    {
-        return Role::all();
-    }
-
-    public function searchUsers($query, $keyword)
-    {
-        $keyword = trim($keyword);
-        if (!$keyword) {
+        if (empty($validRelations)) {
             return $query;
         }
 
-        return $query->where(function($q) use ($keyword) {
-            $q->where('name', 'LIKE', "%{$keyword}%")
-              ->orWhere('email', 'LIKE', "%{$keyword}%")
-              ->orWhere('username', 'LIKE', "%{$keyword}%")
-              ->orWhereHas('profile', function($profileQuery) use ($keyword) {
-                  $profileQuery->where('first_name', 'LIKE', "%{$keyword}%")
-                             ->orWhere('last_name', 'LIKE', "%{$keyword}%")
-                             ->orWhere('phone_number', 'LIKE', "%{$keyword}%");
-              });
-        });
+        return $query->with($validRelations);
     }
 
-    public function filterByStatus($query, $status)
+    public function getUsers($userIds = null, $relations = [])
     {
-        if ($status === 'active') {
-            return $query->where('is_active', 'active');
-        } elseif ($status === 'inactive') {
-            return $query->where('is_active', 'inactive');
-        } elseif ($status === 'unverified') {
-            return $query->whereNull('email_verified_at');
+
+        $query = $this->getBasicQuery()->select(self::defaultSelect);
+        $query = $this->getUsersQueryForWeb($relations)->select(self::defaultSelect);
+
+        if ($userIds) {
+            if (is_array($userIds) || $userIds instanceof Collection) {
+                $query->whereIn('id', (array) $userIds);
+            } else {
+                $query->where('id', $userIds);
+            }
         }
-        
+
         return $query;
     }
 
-    public function filterByRole($query, $role)
+    public function getUsersForDataTablesServerSide(Request $request)
     {
-        return $query->role($role);
+        $baseQuery = $this->getUsers();
+
+        $searchableColumns = [
+            'name',
+            'email',
+            'username',
+        ];
+
+        $orderableColumns = [
+            'id',
+            'name',
+            'username',
+            'email',
+            'created_at',
+        ];
+
+        return $this->processDataTables(
+            $request,
+            $baseQuery,
+            $searchableColumns,
+            $orderableColumns,
+            function ($user, $index) {
+                return $this->formatUserForDataTables($user, $index);
+            }
+        );
+    }
+
+    private function formatUserForDataTables($user, $index)
+    {
+        return [
+            'DT_RowId' => 'row_' . $user->id,
+            'sr_no' => $index,
+            'name' => $user->name,
+            'username' => $user->username,
+            'email' => $user->email,
+            'role' => Str::title(str_replace('-', ' ', $user->roles->first()->name ?? 'N/A')),
+            'created_date' => $user->created_at->format('Y-m-d'),
+            'status' => [
+                'text' => ucfirst($user->is_active),
+                'class' => $user->is_active == 'active' ? 'success' : 'danger'
+            ],
+            'actions' => view('dashboard.users.partials.actions', compact('user'))->render()
+        ];
     }
 
     public function formatUserData(User $user)
@@ -136,18 +141,7 @@ class UserService
             'first_name' => $user->profile->first_name,
             'last_name' => $user->profile->last_name ?? null,
             'email' => $user->email ?? null,
-            'username' => $user->username ?? null,
             'role' => $user->getRoleNames()->first(),
-            'full_name' => $user->name,
-            'is_active' => $user->is_active,
-            'profile_image' => $user->profile->profile_image ?? null,
-            'dob' => $user->profile->dob ?? null,
-            'phone_number' => $user->profile->phone_number,
-            'bio' => $user->profile->bio ?? null,
-            'facebook_url' => $user->profile->facebook_url ?? null,
-            'linkedin_url' => $user->profile->linkedin_url ?? null,
-            'instagram_url' => $user->profile->instagram_url ?? null,
-            'github_url' => $user->profile->github_url ?? null,
         ];
     }
 
@@ -168,6 +162,16 @@ class UserService
             'user_id' => $userId,
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
+        ];
+    }
+
+    public function getUserStats()
+    {
+        return [
+            'totalUsers' => $this->getBasicQuery()->count(),
+            'totalDeactivatedUsers' => $this->getBasicQuery()->where('is_active', 'inactive')->count(),
+            'totalActiveUsers' => $this->getBasicQuery()->where('is_active', 'active')->count(),
+            'totalArchivedUsers' => $this->getBasicQuery()->onlyTrashed()->count(),
         ];
     }
 }

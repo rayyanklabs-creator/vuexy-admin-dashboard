@@ -128,7 +128,8 @@ div.dataTables_processing {
 div.dataTables_processing > div:last-child {
   position: relative;
   width: 80px;
-  height: 15px;
+
+  height: 80px;
   margin: 1em auto;
 }
 

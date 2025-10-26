@@ -29,14 +29,24 @@ class UserController extends Controller
         $this->authorize('view user');
 
         try {
-            $users = $this->userService->getUsersWithProfile()->get();
             $stats = $this->userService->getUserStats();
-            $roles = $this->userService->getRoles();
-
-            return view('dashboard.users.index', compact('users', 'roles') + $stats);
+            return view('dashboard.users.index',  $stats);
         } catch (\Throwable $th) {
             Log::error("User Index Failed:" . $th->getMessage());
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
+        }
+    }
+
+    public function getUsersData(Request $request)
+    {
+        $this->authorize('view user');
+
+        try {
+            $users = $this->userService->getUsersForDataTablesServerSide($request);
+            return response()->json($users);
+        } catch (\Throwable $th) {
+            Log::error("Get Users Data Failed: " . $th->getMessage());
+            return response()->json(['error' => 'Server error'], 500);
         }
     }
 
@@ -98,7 +108,7 @@ class UserController extends Controller
         }
 
         try {
-            $user = $this->userService->getUserById($id);
+            $user = $this->userService->getUsersQueryForWeb(['profile'])->findOrFail($id);
             return response()->json([
                 'success' => true,
                 'user' => $this->userService->formatUserData($user),
@@ -133,7 +143,7 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($id, $request) {
-                $user = $this->userService->getUserById($id, false);
+                $user = $this->userService->getUsersQueryForWeb(null)->findOrFail($id);
                 $user->name = $request->edit_first_name . ' ' . $request->edit_last_name;
                 $user->save();
 
@@ -157,12 +167,12 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $this->authorize('delete user');
 
         try {
-            $user = $this->userService->getUserById($id, false);
+            $user = $this->userService->getUsersQueryForWeb(null)->findOrFail($id);
             $user->delete();
 
             return redirect()->back()->with('success', 'Account Deleted Successfully');
@@ -182,7 +192,7 @@ class UserController extends Controller
         $this->authorize('update user');
 
         try {
-            $user = $this->userService->getUserById($id, false);
+            $user = $this->userService->getUsersQueryForWeb([])->findOrFail($id);
             $message = $user->is_active == 'active' ? 'Account Deactivated Successfully' : 'Account Activated Successfully';
 
             $user->is_active = $user->is_active == 'active' ? 'inactive' : 'active';
