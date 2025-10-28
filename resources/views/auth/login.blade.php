@@ -5,6 +5,7 @@
 @endsection
 
 @section('content')
+<h1 class="text">Text</h1>
     <!-- Login Card -->
     <div class="card">
         <div class="card-body">

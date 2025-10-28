@@ -6,7 +6,7 @@
  */
 :root,
 [data-bs-theme=light] {
-  --bs-blue: #007bff;
+  --primary-color: #0066ff;
   --bs-indigo: #6610f2;
   --bs-purple: #7367f0;
   --bs-pink: #e83e8c;
