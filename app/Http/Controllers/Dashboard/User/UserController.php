@@ -43,7 +43,21 @@ class UserController extends Controller
         $this->authorize('view user');
 
         try {
-            $users = $this->userService->getUsersForDataTablesServerSide($request);
+
+            $searchableColumns = [
+                'name',
+                'email',
+                'username',
+            ];
+
+            $orderableColumns = [
+                'id',
+                'name',
+                'username',
+                'email',
+                'created_at',
+            ];
+            $users = $this->userService->getUsersForDataTablesServerSide($request, $searchableColumns, $orderableColumns);
             return response()->json($users);
         } catch (\Throwable $th) {
             Log::error("Get Users Data Failed: " . $th->getMessage());

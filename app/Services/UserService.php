@@ -71,8 +71,7 @@ class UserService extends BaseService
     }
 
     public function getUsers($userIds = null, $relations = [])
-    {
-        
+    {        
         $relations = is_array($relations) ? $relations : [];
         $query = $this->getBasicQuery()->select(self::defaultSelect);
         $query = $this->getUsersQueryForWeb($relations)->select(self::defaultSelect);
@@ -88,23 +87,9 @@ class UserService extends BaseService
         return $query;
     }
 
-    public function getUsersForDataTablesServerSide(Request $request)
+    public function getUsersForDataTablesServerSide(Request $request, $searchableColumns, $orderableColumns)
     {
         $baseQuery = $this->getUsers();
-
-        $searchableColumns = [
-            'name',
-            'email',
-            'username',
-        ];
-
-        $orderableColumns = [
-            'id',
-            'name',
-            'username',
-            'email',
-            'created_at',
-        ];
 
         return $this->processDataTables(
             $request,

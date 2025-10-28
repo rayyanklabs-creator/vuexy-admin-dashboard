@@ -41,21 +41,9 @@ class ArchivedUserService extends BaseService
         return $this->getBasicQuery()->withTrashed()->findOrFail($id);
     }
 
-    public function getArchivedUsersForDataTablesServerSide(Request $request)
+    public function getArchivedUsersForDataTablesServerSide(Request $request, array $searchableColumns, array $orderableColumns)
     {
         $baseQuery = $this->getBasicQuery()->onlyTrashed();
-
-        $searchableColumns = [
-            'name',
-            'email',
-        ];
-
-        $orderableColumns = [
-            'id',
-            'name',
-            'email',
-            'deleted_at',
-        ];
 
         return $this->processDataTables(
             $request,

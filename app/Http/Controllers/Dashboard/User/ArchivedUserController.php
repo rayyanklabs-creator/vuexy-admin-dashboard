@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard\User;
+
 use App\Http\Controllers\Controller;
 use App\Services\ArchivedUserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -35,11 +36,22 @@ class ArchivedUserController extends Controller
 
     public function getArchivedUsersData(Request $request)
     {
-        
+
         $this->authorize('view archived user');
 
         try {
-            $archivedUsers = $this->archivedUserService->getArchivedUsersForDataTablesServerSide($request);
+            $searchableColumns = [
+                'name',
+                'email',
+            ];
+
+            $orderableColumns = [
+                'id',
+                'name',
+                'email',
+                'deleted_at',
+            ];
+            $archivedUsers = $this->archivedUserService->getArchivedUsersForDataTablesServerSide($request, $searchableColumns, $orderableColumns);
             return response()->json($archivedUsers);
         } catch (\Throwable $th) {
             Log::error("Get Archived Users Data Failed: " . $th->getMessage());
