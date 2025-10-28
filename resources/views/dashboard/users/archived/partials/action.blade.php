@@ -1,5 +1,5 @@
 @canany(['delete archived user', 'restore archived user'])
-    <td class="d-flex">
+    <div class="d-flex">
         @can(['delete archived user'])
             @if (!($user->getRoleNames()->first() == 'admin' || $user->getRoleNames()->first() == 'super-admin'))
                 <form action="{{ route('dashboard.archived-user.destroy', $user->id) }}" method="POST">
@@ -22,5 +22,5 @@
                 </a>
             </span>
         @endcan
-    </td>
+    </div>
 @endcan

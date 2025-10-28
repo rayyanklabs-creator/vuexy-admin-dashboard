@@ -34,46 +34,10 @@
                             <th>{{ __('Role') }}</th>
                             <th>{{ __('Deletion Date') }}</th>
                             <th>{{ __('Status') }}</th>
-                            @canany(['delete archived user', 'restore archived user'])<th class="d-inline-flex">
-                                {{ __('Action') }}</th>@endcan
+                            @canany(['delete archived user', 'restore archived user'])<th>{{ __('Action') }}</th>@endcan
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- @foreach ($archivedUsers as $index => $user)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ Str::title(str_replace('-', ' ', $user->getRoleNames()->first())) }}</td>
-                                <td>{{ $user->deleted_at->format('Y-m-d') }}</td>
-                                <td>
-                                    <span class="badge me-4 bg-label-{{ $user->is_active == 'active' ? 'success' : 'danger' }}">{{ ucfirst($user->is_active) }}</span>
-                                </td>
-                                @canany(['delete archived user', 'restore archived user'])
-                                    <td class="d-flex">
-                                        @can(['delete archived user'])
-                                            @if (!($user->getRoleNames()->first() == 'admin' || $user->getRoleNames()->first() == 'super-admin'))
-                                                <form action="{{ route('dashboard.archived-user.destroy', $user->id) }}" method="POST">
-                                                    @method('DELETE')
-                                                    @csrf
-                                                    <a href="#" type="submit"
-                                                        class="btn btn-icon btn-text-danger waves-effect waves-light rounded-pill delete-record delete_confirmation" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Permanent Delete') }}">
-                                                        <i class="ti ti-trash-x ti-md"></i>
-                                                    </a>
-                                                </form>
-                                            @endif
-                                        @endcan
-                                        @can(['update archived user'])
-                                            <span class="text-nowrap">
-                                                <a href="{{route('dashboard.archived-user.restore', $user->id)}}" class="btn btn-icon btn-text-primary waves-effect waves-light rounded-pill me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Restore User') }}">
-                                                    <i class="ti ti-restore ti-md text-success"></i>
-                                                </a>
-                                            </span>
-                                        @endcan
-                                    </td>
-                                @endcan
-                            </tr>
-                        @endforeach --}}
                     </tbody>
                 </table>
             </div>
@@ -122,7 +86,7 @@
                     data: 'actions',
                     name: 'actions',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
                 }
             @endcanany
         ];

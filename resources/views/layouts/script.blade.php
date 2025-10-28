@@ -39,6 +39,7 @@
 
 @yield('script')
 @yield('data-table-script')
+
 <script>
     $(document).ready(function() {
         $(document).on('click', '.copy-icon', function() {
