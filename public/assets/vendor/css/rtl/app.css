@@ -1,4 +1,5 @@
 :root {
+  /* Configuration for Primary Color */
   --primary-color: #7367f0;
   --primary-hover: #685dd8;
   --primary-color-rgb: 115, 103, 240;
