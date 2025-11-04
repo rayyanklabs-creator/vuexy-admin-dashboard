@@ -5,7 +5,6 @@
 @endsection
 
 @section('content')
-<h1 class="text">Text</h1>
     <!-- Login Card -->
     <div class="card">
         <div class="card-body">
@@ -17,7 +16,7 @@
                 </a>
             </div>
             <!--End Logo -->
-            <h4 class="mb-1">{{ __('Welcome to') }} Vuexy! 👋</h4>
+            <h4 class="mb-1">{{ __('Welcome to') }} Klabs! 👋</h4>
             <p class="mb-6">{{ __('Please sign-in to your account and start the adventure') }}</p>
 
 

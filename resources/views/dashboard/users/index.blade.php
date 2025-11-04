@@ -19,6 +19,7 @@
             border: none !important;
             box-shadow: none !important;
         }
+
     </style>
 @endsection
 
@@ -123,8 +124,8 @@
                     </button>
                 @endcan
             </div>
-            <div class="card-datatable table-responsive">
-                <table class="datatables-users table border-top custom-datatables">
+            <div class="card-datatable ">
+                <table class="datatables-users  table border-top position-relative custom-datatables">
                     <thead>
                         <tr>
                             <th>{{ __('Sr.') }}</th>
@@ -219,8 +220,8 @@
                                     '{{ asset('') }}' + user.profile_image :
                                     '{{ asset('assets/img/default/user.png') }}';
                                 $('#user-info img').attr('src', profileImage);
-                                $('#user-info .user-info h5').text(user.full_name ? user.full_name :
-                                    'N/A');
+                                $('#user-info .user-info h5').text(user.first_name ? user.first_name + (
+                                    user.last_name ? ' ' + user.last_name : '') : 'N/A');
                                 $('#user-info .user-info span.badge').text(user.role ? user.role
                                     .replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) :
                                     'N/A');
@@ -291,20 +292,92 @@
 
 @section('data-table-script')
     <script>
-        let userColumns = [
-            { data: 'sr_no', name: 'sr_no', orderable: false, searchable: false },
-            { data: 'name',  name: 'name', },
-            { data: 'username',name: 'username' },
-            { data: 'email', name: 'email' },
-            { data: 'role', name: 'role',  orderable: false},
-            { data: 'created_date', name: 'created_at'},
-            { data: 'status', name: 'status', render: function(data) { return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';}, orderable: false },
-            @canany(['delete user', 'update user', 'view user']) 
-            { data: 'actions', name: 'actions', orderable: false, searchable: false} 
+        let userColumns = [{
+                data: 'sr_no',
+                name: 'sr_no',
+                orderable: false,
+                searchable: false
+            },
+            {
+                data: 'name',
+                name: 'name',
+            },
+            {
+                data: 'username',
+                name: 'username'
+            },
+            {
+                data: 'email',
+                name: 'email'
+            },
+            {
+                data: 'role',
+                name: 'role',
+                orderable: false
+            },
+            {
+                data: 'created_date',
+                name: 'created_at'
+            },
+            {
+                data: 'status',
+                name: 'status',
+                render: function(data) {
+                    return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';
+                },
+                orderable: false
+            },
+            @canany(['delete user', 'update user', 'view user'])
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                }
             @endcanany
         ];
 
         let userDataTable = initServerSideDataTable("{{ route('dashboard.user.data') }}", userColumns);
+
+        $(document).on('click', '.btn-toggle-status', function(e) {
+            e.preventDefault();
+            let btn = $(this);
+            let userId = btn.data('id');
+            let changeStatusRoute = "{{ route('dashboard.user.status.update', ':id') }}".replace(':id', userId);
+            btn.prop('disabled', true);
+
+            $.ajax({
+                url: changeStatusRoute,
+                type: 'GET',
+                success: function(response) {
+                    if ({{ auth()->id() }} == userId) {
+                        location.reload();
+                    } else {
+                        Swal.fire({
+                            title: response.success ? 'Success!' : 'Error!',
+                            text: response.message,
+                            icon: response.success ? 'success' : 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        userDataTable.ajax.reload(null, false);
+                    }
+                },
+                error: function(xhr) {
+                    console.log("efe");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Something went wrong!',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                },
+                complete: function() {
+                    btn.prop('disabled', false);
+                }
+            });
+        });
 
         $(document).on('ajaxComplete', function(event, xhr, settings) {
             if (settings.url.includes('user.update') || settings.url.includes('user.destroy') ||

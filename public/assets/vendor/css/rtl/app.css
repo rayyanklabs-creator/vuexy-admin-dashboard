@@ -1,10 +1,12 @@
 :root {
   /* Configuration for Primary Color */
-  --primary-color: #7367f0;
-  --primary-hover: #685dd8;
-  --primary-color-rgb: 115, 103, 240;
-
+  --primary-color: #F02553;
+  --primary-hover: #D81F4A;
+  --primary-color-rgb: 240, 37, 83;
+  --a-hover: #D81F4A;
 }
+/* a hover */
+/* #8176f2 */
 
 /* #685dd8 */
 

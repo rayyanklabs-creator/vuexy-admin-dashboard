@@ -30,7 +30,7 @@ var MainDataTableConfig = {
 
 // Simple loading indicator approach
 const addSimpleLoadingIndicator = (dtTable) => {
-    var $wrapper = dtTable.closest('.card-datatable');
+    var $wrapper = dtTable.closest('.custom-datatables');
 
     var loadingHtml = '<div class="simple-datatable-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">' +
         '<div class="spinner-border text-primary" role="status">' +
@@ -57,6 +57,25 @@ const addSimpleLoadingIndicator = (dtTable) => {
 }
 
 
+const fixResponsiveWrapper = (dtTable) => {
+    const $table = $(dtTable);
+    const $card = $table.closest('.card-datatable');
+
+    $table.on('draw.dt', function () {
+        let api = $table.DataTable();
+        let rowCount = api.data().length;
+
+        if (rowCount === 0) {
+            $card.addClass('table-responsive');
+            $table.removeClass('table-responsive');
+        } else {
+            $card.removeClass('table-responsive');
+            $table.addClass('table-responsive');
+        }
+    });
+};
+
+
 // ================================
 // Server-side DataTable
 // ================================
@@ -80,7 +99,7 @@ const initServerSideDataTable = (ajaxUrl, columns, pageLength = 10) => {
         }, MainDataTableConfig));
 
         addSimpleLoadingIndicator(dtTable);
-
+        fixResponsiveWrapper(dtTable);
         fixDataTableStyling();
         return dataTableInstance;
     }

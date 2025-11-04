@@ -913,7 +913,7 @@ a {
   color: var(--primary-color);
 }
 a:hover {
-  color: #8176f2;
+  color: var(--a-hover);
 }
 
 .fill-primary {
