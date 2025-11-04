@@ -196,11 +196,8 @@ class UserController extends Controller
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
         }
     }
-
-
-
     /**
-     * Update status of the specified resource from storage.
+     * Change status of the specified user from storage.
      */
     public function updateStatus(string $id)
     {
@@ -213,10 +210,18 @@ class UserController extends Controller
             $user->is_active = $user->is_active == 'active' ? 'inactive' : 'active';
             $user->saveQuietly();
 
-            return redirect()->back()->with('success', $message);
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'status' => $user->is_active
+            ]);
         } catch (\Throwable $th) {
             Log::error('Account Status Updation Failed', ['error' => $th->getMessage()]);
-            return redirect()->back()->with('error', "Something went wrong! Please try again later");
+
+            return response()->json([
+                'error' => true,
+                'message' => 'Something went wrong! Please try again later'
+            ], 500);
         }
     }
 }
