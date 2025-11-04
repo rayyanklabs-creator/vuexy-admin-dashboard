@@ -126,8 +126,10 @@ class UserService extends BaseService
             'id' => $user->id,
             'first_name' => $user->profile->first_name,
             'last_name' => $user->profile->last_name ?? null,
+            'username'=> $user->username,
             'email' => $user->email ?? null,
             'role' => $user->getRoleNames()->first(),
+            'phone_number'=> $user->phone_number
         ];
     }
 
