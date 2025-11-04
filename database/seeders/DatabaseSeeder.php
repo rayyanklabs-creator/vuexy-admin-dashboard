@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-
         $this->call([
             UserRolePermissionSeeder::class,
         ]);
@@ -27,8 +26,7 @@ class DatabaseSeeder extends Seeder
                 $user->profile()->create([
                     'first_name' => $user->name,
                 ]);
-
-                // optionally assign role
+                
                 $user->assignRole('user');
             });
     }
