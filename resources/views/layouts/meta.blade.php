@@ -6,4 +6,4 @@
 <meta name="author" content="@yield('author')">
 <!-- Favicon -->
 {{-- <link rel="icon" type="image/x-icon" href="{{asset(\App\Helpers\Helper::getFavicon())}}" /> --}}
-<link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon/favicon.ico')}}" />
+<link rel="icon" type="image/x-icon" href="{{ asset(config('branding.favicon')) }}" />

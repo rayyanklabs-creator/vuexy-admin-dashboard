@@ -11,7 +11,7 @@
         <div class="card-body">
             <div class="app-brand justify-content-center mb-6">
                 <a href="{{ route('login') }}" class="app-brand-link">
-                    <span class="app-brand-logo demo"><img src="{{ asset('dashboard-assets/images/logo.png') }}"></span>
+                    <span class="app-brand-logo demo"><img src="{{ asset(config('branding.logo')) }}" alt="{{ env('APP_NAME') }}"></span>
                 </a>
             </div>
             <h4 class="mb-1">{{ __('Verify your email ✉️') }}</h4>

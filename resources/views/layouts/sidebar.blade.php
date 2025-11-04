@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="{{ route('dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo-dashboard demo">
-                <img src="{{ asset('dashboard-assets/images/logo.png') }}" alt="{{ env('APP_NAME') }}">
+                <img src="{{ asset(config('branding.logo')) }}" alt="{{ env('APP_NAME') }}">
             </span>
             {{-- <span class="app-brand-text demo menu-text fw-bold">{{\App\Helpers\Helper::getCompanyName()}}</span> --}}
         </a>
