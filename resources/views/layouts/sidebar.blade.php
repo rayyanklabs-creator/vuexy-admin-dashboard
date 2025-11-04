@@ -1,11 +1,10 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="{{ route('dashboard') }}" class="app-brand-link">
-            <span class="app-brand-logo demo">
-                <img src="{{ asset('assets/img/logo/default.svg') }}" alt="{{ env('APP_NAME') }}">
+            <span class="app-brand-logo-dashboard demo">
+                <img src="{{ asset('dashboard-assets/images/logo.png') }}" alt="{{ env('APP_NAME') }}">
             </span>
             {{-- <span class="app-brand-text demo menu-text fw-bold">{{\App\Helpers\Helper::getCompanyName()}}</span> --}}
-            <span class="app-brand-text demo menu-text fw-bold">Vuexy</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

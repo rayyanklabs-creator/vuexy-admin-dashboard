@@ -13,8 +13,7 @@
             <!-- Logo -->
             <div class="app-brand justify-content-center mb-6">
                 <a href="{{ route('register') }}" class="app-brand-link">
-                    <span class="app-brand-logo demo"><img src="{{ asset('assets/img/logo/default.svg') }}"></span>
-                    <span class="app-brand-text demo text-heading fw-bold"> Vuexy</span>
+                    <span class="app-brand-logo demo"><img src="{{ asset('dashboard-assets/images/logo.png') }}"></span>
                 </a>
             </div>
             <!--End Logo -->
