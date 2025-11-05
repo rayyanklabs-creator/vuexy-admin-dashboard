@@ -27,10 +27,12 @@ var MainDataTableConfig = {
         ]
     }]
 };
-
+// ======================================
 // Simple loading indicator approach
+// ======================================
+
 const addSimpleLoadingIndicator = (dtTable) => {
-    var $wrapper = dtTable.closest('.custom-datatables');
+    var wrapper = dtTable.closest('.custom-datatables');
 
     var loadingHtml = '<div class="simple-datatable-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9; display: flex; align-items: center; justify-content: center;">' +
         '<div class="spinner-border text-primary" role="status">' +
@@ -38,23 +40,27 @@ const addSimpleLoadingIndicator = (dtTable) => {
         '</div>' +
         '</div>';
 
-    $wrapper.append(loadingHtml);
+    wrapper.append(loadingHtml);
 
-    var $loader = $wrapper.find('.simple-datatable-loader');
+    var loader = wrapper.find('.simple-datatable-loader');
 
     dtTable.on('processing.dt', function (e, settings, processing) {
         if (processing) {
-            $loader.fadeIn(120);
+            loader.fadeIn(120);
         } else {
-            $loader.fadeOut(120);
+            loader.fadeOut(120);
         }
     });
 
-    $loader.fadeIn(120);
+    loader.fadeIn(120);
     dtTable.on('init.dt', function () {
-        $loader.fadeOut(120);
+        loader.fadeOut(120);
     });
 }
+
+// ================================
+// Fix Responsive Wrapper
+// ================================
 
 const fixResponsiveWrapper = (dtTable) => {
     const table = $(dtTable);
@@ -145,9 +151,6 @@ const initClientSideDataTable = (pageLength = 10) => {
                 });
             }
         }, MainDataTableConfig));
-
-        // addSimpleLoadingIndicator(dtTable);
-
         fixDataTableStyling();
         return dataTableInstance;
     }

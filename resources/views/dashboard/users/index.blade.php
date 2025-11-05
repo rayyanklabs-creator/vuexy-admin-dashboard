@@ -19,7 +19,6 @@
             border: none !important;
             box-shadow: none !important;
         }
-
     </style>
 @endsection
 
@@ -128,6 +127,7 @@
                 <table class="datatables-users  table border-top position-relative custom-datatables">
                     <thead>
                         <tr>
+                            <th><input type="checkbox" class="form-check-input" id="select-all"></th>
                             <th>{{ __('Sr.') }}</th>
                             <th>{{ __('Name') }}</th>
                             <th>{{ __('Username') }}</th>
@@ -293,6 +293,12 @@
 @section('data-table-script')
     <script>
         let userColumns = [{
+                data: 'checkbox',
+                name: 'checkbox',
+                orderable: false,
+                searchable: false
+            },
+            {
                 data: 'sr_no',
                 name: 'sr_no',
                 orderable: false,
@@ -386,6 +392,29 @@
                     userDataTable.ajax.reload(null, false);
                 }
             }
+        });
+        $(document).on('change', '#select-all', function() {
+            const isChecked = $(this).is(':checked');
+            const table = $('.custom-datatables').DataTable();
+
+            table.rows({
+                    page: 'current'
+                }).nodes().to$()
+                .find('input[type="checkbox"]').prop('checked', isChecked);
+        });
+
+        $(document).on('change', '.custom-datatables tbody input[type="checkbox"]', function() {
+            const table = $('.custom-datatables').DataTable();
+            const total = table.rows({
+                    page: 'current'
+                }).nodes().to$()
+                .find('input[type="checkbox"]').length;
+            const checked = table.rows({
+                    page: 'current'
+                }).nodes().to$()
+                .find('input[type="checkbox"]:checked').length;
+
+            $('#select-all').prop('checked', total === checked);
         });
     </script>
 @endsection

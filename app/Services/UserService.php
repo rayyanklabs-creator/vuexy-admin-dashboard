@@ -71,7 +71,7 @@ class UserService extends BaseService
     }
 
     public function getUsers($userIds = null, $relations = [])
-    {        
+    {
         $relations = is_array($relations) ? $relations : [];
         $query = $this->getBasicQuery()->select(self::defaultSelect);
         $query = $this->getUsersQueryForWeb($relations)->select(self::defaultSelect);
@@ -104,8 +104,14 @@ class UserService extends BaseService
 
     private function formatUserForDataTables($user, $index)
     {
+        $roleName = $user->roles->first()->name ?? 'N/A';
+        $roleTitle = Str::title(str_replace('-', ' ', $roleName));
         return [
             'DT_RowId' => 'row_' . $user->id,
+            'checkbox' => !in_array($roleName, ['admin', 'super-admin'])
+                ? '<input type="checkbox" class="form-check-input" value="' . $user->id . '">'
+                : '',
+
             'sr_no' => $index,
             'name' => $user->name,
             'username' => $user->username,
@@ -126,10 +132,10 @@ class UserService extends BaseService
             'id' => $user->id,
             'first_name' => $user->profile->first_name,
             'last_name' => $user->profile->last_name ?? null,
-            'username'=> $user->username,
+            'username' => $user->username,
             'email' => $user->email ?? null,
             'role' => $user->getRoleNames()->first(),
-            'phone_number'=> $user->phone_number
+            'phone_number' => $user->phone_number
         ];
     }
 
@@ -163,7 +169,8 @@ class UserService extends BaseService
         ];
     }
 
-    public function getRole(){
+    public function getRole()
+    {
         return Role::all();
     }
 }
