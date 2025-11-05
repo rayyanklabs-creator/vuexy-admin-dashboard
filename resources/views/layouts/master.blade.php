@@ -5,7 +5,7 @@
 
 <head>
     {{-- <title>{{ \App\Helpers\Helper::getCompanyName() }} - @yield('title')</title> --}}
-    <title> - @yield('title')</title>
+    <title> {{ config('app.name') }} - @yield('title')</title>
     @include('layouts.meta')
     @include('layouts.css')
     @yield('css')
