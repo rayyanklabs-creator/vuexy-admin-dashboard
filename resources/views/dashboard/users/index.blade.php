@@ -347,6 +347,22 @@
 
         let userDataTable = initServerSideDataTable("{{ route('dashboard.user.data') }}", userColumns);
 
+         const refreshUserStats = () => {
+            $.ajax({
+                url: "{{ route('dashboard.user.stats') }}",
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        let stats = response.data;
+                        $('[data-stat="totalUsers"]').text(stats.totalUsers);
+                        $('[data-stat="totalDeactivatedUsers"]').text(stats.totalDeactivatedUsers);
+                        $('[data-stat="totalActiveUsers"]').text(stats.totalActiveUsers);
+                        $('[data-stat="totalArchivedUsers"]').text(stats.totalArchivedUsers);
+                    }
+                }
+            });
+        }
+
         $(document).on('click', '.btn-toggle-status', function(e) {
             e.preventDefault();
             let btn = $(this);
@@ -387,11 +403,12 @@
             });
         });
 
-        // AJAX QUERY FOR DELETED SELECTED
+        
+        let userCheckboxManager = initDataTableCheckboxes(userDataTable);
         $(document).on('click', '#delete-selected', function(e) {
             e.preventDefault();
             $(document).one('delete:confirmed', function() {
-                const ids = getSelectedIds();
+                const ids = userCheckboxManager.getSelectedIds();
                 console.log(ids);
                 let bulkDeleteRoute = "{{ route('dashboard.user.bulkDelete') }}";
                 $.ajax({
@@ -413,8 +430,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             });
-                            clearAllSelections();
-                            toggleDeleteButton();
+                            userCheckboxManager.clearSelections();
                             userDataTable.ajax.reload(null, false);
                             refreshUserStats();
                         }
@@ -435,104 +451,7 @@
             });
         });
 
-
-
-        $(document).on('change', '#select-all', function() {
-            const isChecked = $(this).is(':checked');
-
-            userDataTable.rows({
-                page: 'current'
-            }).nodes().to$().find('.row-checkbox').each(function() {
-                const userId = $(this).val();
-
-                if (isChecked) {
-                    $(this).prop('checked', true);
-                    if (!selectedIds.includes(userId)) {
-                        selectedIds.push(userId);
-                    }
-                } else {
-                    $(this).prop('checked', false);
-                    selectedIds = selectedIds.filter(id => id !== userId);
-                }
-            });
-            toggleDeleteButton();
-            syncSelectAllCheckbox();
-        });
-
-        $(document).on('change', '.row-checkbox', function() {
-            const userId = $(this).val();
-            if ($(this).is(':checked')) {
-                if (!selectedIds.includes(userId)) selectedIds.push(userId);
-            } else {
-                selectedIds = selectedIds.filter(id => id !== userId);
-            }
-            toggleDeleteButton();
-            syncSelectAllCheckbox();
-        });
-
-        userDataTable.on('draw', function() {
-            userDataTable.rows({
-                page: 'current'
-            }).nodes().to$().find('.row-checkbox').each(function() {
-                const userId = $(this).val();
-                $(this).prop('checked', selectedIds.includes(userId));
-            });
-            toggleDeleteButton();
-            syncSelectAllCheckbox();
-        });
-
-        userDataTable.on('order.dt', function() {
-            clearAllSelections();
-        });
-
-        const toggleDeleteButton = () => {
-            if (selectedIds.length > 0) {
-                $('#delete-selected').removeClass('d-none').fadeIn(150);
-            } else {
-                console.log("feef");
-                $('#delete-selected').fadeOut(150, function() {
-                    $(this).addClass('d-none');
-                });
-            }
-        };
-
-      
-
-        const syncSelectAllCheckbox = () => {
-            const allCheckboxes = userDataTable.rows({
-                page: 'current'
-            }).nodes().to$().find('.row-checkbox');
-            const checkedCheckboxes = allCheckboxes.filter(':checked');
-            $('#select-all').prop('checked', allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes
-                .length);
-        }
-
-        const getSelectedIds = () => {
-            return selectedIds;
-        }
-
-        const clearAllSelections = () => {
-            selectedIds = [];
-            $('#select-all').prop('checked', false);
-            userDataTable.rows().nodes().to$().find('.row-checkbox').prop('checked', false);
-        }
-
-
-          const refreshUserStats = () => {
-            $.ajax({
-                url: "{{ route('dashboard.user.stats') }}",
-                type: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        let stats = response.data;
-                        $('[data-stat="totalUsers"]').text(stats.totalUsers);
-                        $('[data-stat="totalDeactivatedUsers"]').text(stats.totalDeactivatedUsers);
-                        $('[data-stat="totalActiveUsers"]').text(stats.totalActiveUsers);
-                        $('[data-stat="totalArchivedUsers"]').text(stats.totalArchivedUsers);
-                    }
-                }
-            });
-        }
+         
 
         $(document).on('ajaxComplete', function(event, xhr, settings) {
             if (settings.url.includes('user.update') || settings.url.includes('user.destroy') ||
