@@ -4,12 +4,13 @@ namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class BaseService
 {
     /**
      * Common DataTables server-side processing (optimized for eager loading)
-    */
+     */
     protected function processDataTables(
         Request $request,
         Builder $query,
@@ -33,12 +34,13 @@ class BaseService
         $orderColumnIndex = (int) $request->input('order.0.column', 0);
         $orderDirection = $request->input('order.0.dir', 'asc');
 
-        if (isset($orderableColumns[$orderColumnIndex])) {
-            $query->orderBy($orderableColumns[$orderColumnIndex], $orderDirection);
-        } else {
-            $query->orderByDesc('id'); 
-        }
+        $orderColumnName = $request->input("columns.{$orderColumnIndex}.name");
 
+        if (!empty($orderColumnName) && in_array($orderColumnName, $orderableColumns)) {
+            $query->orderBy($orderColumnName, $orderDirection);
+        } else {
+            $query->orderBy('id', 'asc');
+        }
 
         $limit = (int) $request->input('length', 10);
         $start = (int) $request->input('start', 0);
