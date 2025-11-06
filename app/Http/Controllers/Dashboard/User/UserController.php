@@ -55,6 +55,7 @@ class UserController extends Controller
                 'name',
                 'username',
                 'email',
+                'is_active',
                 'created_at',
             ];
             $users = $this->userService->getUsersForDataTablesServerSide($request, $searchableColumns, $orderableColumns);

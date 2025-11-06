@@ -91,8 +91,6 @@ const fixResponsiveWrapper = (dtTable) => {
     });
 };
 
-
-
 // ================================
 // Server-side DataTable
 // ================================
@@ -113,6 +111,7 @@ const initServerSideDataTable = (ajaxUrl, columns, pageLength = 10) => {
             },
             columns: columns,
             pageLength: pageLength,
+            
         }, MainDataTableConfig));
 
         addSimpleLoadingIndicator(dtTable);

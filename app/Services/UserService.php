@@ -106,17 +106,18 @@ class UserService extends BaseService
     {
         $roleName = $user->roles->first()->name ?? 'N/A';
         $roleTitle = Str::title(str_replace('-', ' ', $roleName));
+
         return [
             'DT_RowId' => 'row_' . $user->id,
             'checkbox' => !in_array($roleName, ['admin', 'super-admin'])
-                ? '<input type="checkbox" class="form-check-input" value="' . $user->id . '">'
+                ? '<input type="checkbox" class="form-check-input row-checkbox" value="' . $user->id . '">'
                 : '',
 
             'sr_no' => $index,
             'name' => $user->name,
             'username' => $user->username,
             'email' => $user->email,
-            'role' => Str::title(str_replace('-', ' ', $user->roles->first()->name ?? 'N/A')),
+            'role' => $roleTitle,
             'created_date' => $user->created_at->format('Y-m-d'),
             'status' => [
                 'text' => ucfirst($user->is_active),
@@ -125,6 +126,7 @@ class UserService extends BaseService
             'actions' => view('dashboard.users.partials.actions', compact('user'))->render()
         ];
     }
+
 
     public function formatUserData(User $user)
     {

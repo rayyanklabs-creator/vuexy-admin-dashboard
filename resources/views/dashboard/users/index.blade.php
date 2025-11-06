@@ -327,11 +327,11 @@
             },
             {
                 data: 'status',
-                name: 'status',
+                name: 'is_active',
                 render: function(data) {
+                    console.log(data);
                     return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';
                 },
-                orderable: false
             },
             @canany(['delete user', 'update user', 'view user'])
                 {
@@ -342,6 +342,8 @@
                 }
             @endcanany
         ];
+
+        let selectedIds = [];
 
         let userDataTable = initServerSideDataTable("{{ route('dashboard.user.data') }}", userColumns);
 
@@ -385,6 +387,63 @@
             });
         });
 
+        $(document).on('change', '#select-all', function() {
+            const isChecked = $(this).is(':checked');
+
+            userDataTable.rows({
+                page: 'current'
+            }).nodes().to$().find('.row-checkbox').each(function() {
+                const userId = $(this).val();
+
+                if (isChecked) {
+                    $(this).prop('checked', true);
+                    if (!selectedIds.includes(userId)) selectedIds.push(userId);
+                } else {
+                    $(this).prop('checked', false);
+                    selectedIds = selectedIds.filter(id => id !== userId);
+                }
+            });
+            syncSelectAllCheckbox();
+        });
+
+        $(document).on('change', '.row-checkbox', function() {
+            const userId = $(this).val();
+            if ($(this).is(':checked')) {
+                if (!selectedIds.includes(userId)) selectedIds.push(userId);
+            } else {
+                selectedIds = selectedIds.filter(id => id !== userId);
+            }
+            syncSelectAllCheckbox();
+        });
+
+        userDataTable.on('draw', function() {
+            userDataTable.rows({
+                page: 'current'
+            }).nodes().to$().find('.row-checkbox').each(function() {
+                const userId = $(this).val();
+                $(this).prop('checked', selectedIds.includes(userId));
+            });
+            syncSelectAllCheckbox();
+        });
+
+        const syncSelectAllCheckbox = () => {
+            const allCheckboxes = userDataTable.rows({
+                page: 'current'
+            }).nodes().to$().find('.row-checkbox');
+            const checkedCheckboxes = allCheckboxes.filter(':checked');
+            $('#select-all').prop('checked', allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes.length);
+        }
+
+        function getSelectedIds() {
+            return selectedIds;
+        }
+
+        const  clearAllSelections = ()=> {
+            selectedIds = [];
+            $('#select-all').prop('checked', false);
+            userDataTable.rows().nodes().to$().find('.row-checkbox').prop('checked', false);
+        }
+
         $(document).on('ajaxComplete', function(event, xhr, settings) {
             if (settings.url.includes('user.update') || settings.url.includes('user.destroy') ||
                 settings.url.includes('user.store')) {
@@ -393,28 +452,29 @@
                 }
             }
         });
-        $(document).on('change', '#select-all', function() {
-            const isChecked = $(this).is(':checked');
-            const table = $('.custom-datatables').DataTable();
 
-            table.rows({
-                    page: 'current'
-                }).nodes().to$()
-                .find('input[type="checkbox"]').prop('checked', isChecked);
-        });
+        // $(document).on('change', '#select-all', function() {
+        //     const isChecked = $(this).is(':checked');
+        //     const table = $('.custom-datatables').DataTable();
 
-        $(document).on('change', '.custom-datatables tbody input[type="checkbox"]', function() {
-            const table = $('.custom-datatables').DataTable();
-            const total = table.rows({
-                    page: 'current'
-                }).nodes().to$()
-                .find('input[type="checkbox"]').length;
-            const checked = table.rows({
-                    page: 'current'
-                }).nodes().to$()
-                .find('input[type="checkbox"]:checked').length;
+        //     table.rows({
+        //             page: 'current'
+        //         }).nodes().to$()
+        //         .find('input[type="checkbox"]').prop('checked', isChecked);
+        // });
 
-            $('#select-all').prop('checked', total === checked);
-        });
+        // $(document).on('change', '.custom-datatables tbody input[type="checkbox"]', function() {
+        //     const table = $('.custom-datatables').DataTable();
+        //     const total = table.rows({
+        //             page: 'current'
+        //         }).nodes().to$()
+        //         .find('input[type="checkbox"]').length;
+        //     const checked = table.rows({
+        //             page: 'current'
+        //         }).nodes().to$()
+        //         .find('input[type="checkbox"]:checked').length;
+
+        //     $('#select-all').prop('checked', total === checked);
+        // });
     </script>
 @endsection
