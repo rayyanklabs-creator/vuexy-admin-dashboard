@@ -66,6 +66,24 @@ class UserController extends Controller
         }
     }
 
+    public function getStats()
+    {
+        try {
+            $stats = $this->userService->getUserStats();
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+        } catch (\Throwable $th) {
+            Log::error("User Stats Fetch Failed: " . $th->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch user stats!'
+            ], 500);
+        }
+    }
+
+
     // /**
     //  * Store a newly created resource in storage.
     //  */
@@ -197,6 +215,34 @@ class UserController extends Controller
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
         }
     }
+
+    /**
+     * Bulk Delete
+     */
+
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['error' => true, 'message' => 'No users selected.'], 500);
+        }
+        try {
+            $this->userService->getUsers($ids, null)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) . ' user(s) deleted successfully.'
+            ]);
+        } catch (\Throwable $th) {
+
+            Log::error('Bulk User Delete Failed', ['error' => $th->getMessage()]);
+            return response()->json([
+                'error' => true,
+                'message' => 'Something went wrong! Please try again later'
+            ], 500);
+        }
+    }
+
     /**
      * Change status of the specified user from storage.
      */

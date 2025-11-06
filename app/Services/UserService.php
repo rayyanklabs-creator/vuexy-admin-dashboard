@@ -161,15 +161,33 @@ class UserService extends BaseService
         ];
     }
 
+    // public function getUserStats()
+    // {
+    //     return [
+    //         'totalUsers' => $this->getBasicQuery()->count(),
+    //         'totalDeactivatedUsers' => $this->getBasicQuery()->where('is_active', 'inactive')->count(),
+    //         'totalActiveUsers' => $this->getBasicQuery()->where('is_active', 'active')->count(),
+    //         'totalArchivedUsers' => $this->getBasicQuery()->onlyTrashed()->count(),
+    //     ];
+    // }
+
     public function getUserStats()
     {
+        $baseQuery = $this->getBasicQuery();
+
+        $totalUsers = (clone $baseQuery)->count();
+        $totalActiveUsers = (clone $baseQuery)->where('is_active', 'active')->count();
+        $totalDeactivatedUsers = (clone $baseQuery)->where('is_active', 'inactive')->count();
+        $totalArchivedUsers = (clone $baseQuery)->onlyTrashed()->count();
+
         return [
-            'totalUsers' => $this->getBasicQuery()->count(),
-            'totalDeactivatedUsers' => $this->getBasicQuery()->where('is_active', 'inactive')->count(),
-            'totalActiveUsers' => $this->getBasicQuery()->where('is_active', 'active')->count(),
-            'totalArchivedUsers' => $this->getBasicQuery()->onlyTrashed()->count(),
+            'totalUsers' => $totalUsers,
+            'totalDeactivatedUsers' => $totalDeactivatedUsers,
+            'totalActiveUsers' => $totalActiveUsers,
+            'totalArchivedUsers' => $totalArchivedUsers,
         ];
     }
+
 
     public function getRole()
     {
