@@ -42,12 +42,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
         Route::prefix('dashboard')->name('dashboard.')->group(function () {
             // User Routes
+            Route::get('/user/stats', [UserController::class, 'getStats'])->name('user.stats');
+            Route::get('user/status/{id}', [UserController::class, 'updateStatus'])->name('user.status.update');
+            Route::delete('/user/bulk-delete', [UserController::class, 'bulkDelete'])->name('user.bulkDelete');
             Route::resource('user', UserController::class);
-            Route::resource('archived-user', ArchivedUserController::class);
             Route::get('/users/data', [UserController::class, 'getUsersData'])->name('user.data');
+
+            Route::resource('archived-user', ArchivedUserController::class);
             Route::get('/users/archived-user', [ArchivedUserController::class, 'getArchivedUsersData'])->name('archived-user.data');
             Route::get('user/restore/{id}', [ArchivedUserController::class, 'restoreUser'])->name('archived-user.restore');
-            Route::get('user/status/{id}', [UserController::class, 'updateStatus'])->name('user.status.update');
             // Role and Permission Routes
             Route::resource('permissions', PermissionController::class);
             Route::resource('roles', RoleController::class);
