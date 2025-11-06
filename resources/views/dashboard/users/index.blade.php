@@ -36,7 +36,7 @@
                             <div class="content-left">
                                 <span class="text-heading">{{ __('Users') }}</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">{{ $totalUsers }}</h4>
+                                    <h4 class="mb-0 me-2" data-stat="totalUsers">{{ $totalUsers }}</h4>
                                 </div>
                                 <small class="mb-0">{{ __('Total Users') }}</small>
                             </div>
@@ -56,7 +56,7 @@
                             <div class="content-left">
                                 <span class="text-heading">{{ __('Deactivated Users') }}</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">
+                                    <h4 class="mb-0 me-2" data-stat="totalDeactivatedUsers">
                                         {{ $totalDeactivatedUsers }}
                                     </h4>
                                 </div>
@@ -78,7 +78,7 @@
                             <div class="content-left">
                                 <span class="text-heading">{{ __('Active Users') }}</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">{{ $totalActiveUsers }}</h4>
+                                    <h4 class="mb-0 me-2" data-stat="totalActiveUsers">{{ $totalActiveUsers }}</h4>
                                 </div>
                                 <small class="mb-0">{{ __('Total Active Users') }}</small>
                             </div>
@@ -98,7 +98,7 @@
                             <div class="content-left">
                                 <span class="text-heading">{{ __('Archived Users') }}</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">{{ $totalArchivedUsers }}</h4>
+                                    <h4 class="mb-0 me-2" data-stat="totalArchivedUsers">{{ $totalArchivedUsers }}</h4>
                                 </div>
                                 <small class="mb-0">{{ __('Total Archived Users') }}</small>
                             </div>
@@ -125,6 +125,7 @@
             </div>
             <div class="card-datatable ">
                 <table class="datatables-users  table border-top position-relative custom-datatables">
+
                     <thead>
                         <tr>
                             <th><input type="checkbox" class="form-check-input" id="select-all"></th>
@@ -329,7 +330,6 @@
                 data: 'status',
                 name: 'is_active',
                 render: function(data) {
-                    console.log(data);
                     return '<span class="badge me-4 bg-label-' + data.class + '">' + data.text + '</span>';
                 },
             },
@@ -369,10 +369,10 @@
                             showConfirmButton: false
                         });
                         userDataTable.ajax.reload(null, false);
+                        refreshUserStats();
                     }
                 },
                 error: function(xhr) {
-                    console.log("efe");
                     Swal.fire({
                         title: 'Error!',
                         text: 'Something went wrong!',
@@ -387,6 +387,56 @@
             });
         });
 
+        // AJAX QUERY FOR DELETED SELECTED
+        $(document).on('click', '#delete-selected', function(e) {
+            e.preventDefault();
+            $(document).one('delete:confirmed', function() {
+                const ids = getSelectedIds();
+                console.log(ids);
+                let bulkDeleteRoute = "{{ route('dashboard.user.bulkDelete') }}";
+                $.ajax({
+                    url: bulkDeleteRoute,
+                    type: 'DELETE',
+                    data: {
+                        ids: ids,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    beforeSend: function() {
+                        $('#delete-selected').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: response.success ? 'Success!' : 'Error!',
+                                text: response.message,
+                                icon: response.success ? 'success' : 'error',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            clearAllSelections();
+                            toggleDeleteButton();
+                            userDataTable.ajax.reload(null, false);
+                            refreshUserStats();
+                        }
+                    },
+                    error: function(err) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: err.message,
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    complete: function() {
+                        $('#delete-selected').prop('disabled', false).removeClass('opacity-50');
+                    }
+                });
+            });
+        });
+
+
+
         $(document).on('change', '#select-all', function() {
             const isChecked = $(this).is(':checked');
 
@@ -397,12 +447,15 @@
 
                 if (isChecked) {
                     $(this).prop('checked', true);
-                    if (!selectedIds.includes(userId)) selectedIds.push(userId);
+                    if (!selectedIds.includes(userId)) {
+                        selectedIds.push(userId);
+                    }
                 } else {
                     $(this).prop('checked', false);
                     selectedIds = selectedIds.filter(id => id !== userId);
                 }
             });
+            toggleDeleteButton();
             syncSelectAllCheckbox();
         });
 
@@ -413,6 +466,7 @@
             } else {
                 selectedIds = selectedIds.filter(id => id !== userId);
             }
+            toggleDeleteButton();
             syncSelectAllCheckbox();
         });
 
@@ -423,25 +477,61 @@
                 const userId = $(this).val();
                 $(this).prop('checked', selectedIds.includes(userId));
             });
+            toggleDeleteButton();
             syncSelectAllCheckbox();
         });
+
+        userDataTable.on('order.dt', function() {
+            clearAllSelections();
+        });
+
+        const toggleDeleteButton = () => {
+            if (selectedIds.length > 0) {
+                $('#delete-selected').removeClass('d-none').fadeIn(150);
+            } else {
+                console.log("feef");
+                $('#delete-selected').fadeOut(150, function() {
+                    $(this).addClass('d-none');
+                });
+            }
+        };
+
+      
 
         const syncSelectAllCheckbox = () => {
             const allCheckboxes = userDataTable.rows({
                 page: 'current'
             }).nodes().to$().find('.row-checkbox');
             const checkedCheckboxes = allCheckboxes.filter(':checked');
-            $('#select-all').prop('checked', allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes.length);
+            $('#select-all').prop('checked', allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes
+                .length);
         }
 
-        function getSelectedIds() {
+        const getSelectedIds = () => {
             return selectedIds;
         }
 
-        const  clearAllSelections = ()=> {
+        const clearAllSelections = () => {
             selectedIds = [];
             $('#select-all').prop('checked', false);
             userDataTable.rows().nodes().to$().find('.row-checkbox').prop('checked', false);
+        }
+
+
+          const refreshUserStats = () => {
+            $.ajax({
+                url: "{{ route('dashboard.user.stats') }}",
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        let stats = response.data;
+                        $('[data-stat="totalUsers"]').text(stats.totalUsers);
+                        $('[data-stat="totalDeactivatedUsers"]').text(stats.totalDeactivatedUsers);
+                        $('[data-stat="totalActiveUsers"]').text(stats.totalActiveUsers);
+                        $('[data-stat="totalArchivedUsers"]').text(stats.totalArchivedUsers);
+                    }
+                }
+            });
         }
 
         $(document).on('ajaxComplete', function(event, xhr, settings) {
@@ -452,29 +542,5 @@
                 }
             }
         });
-
-        // $(document).on('change', '#select-all', function() {
-        //     const isChecked = $(this).is(':checked');
-        //     const table = $('.custom-datatables').DataTable();
-
-        //     table.rows({
-        //             page: 'current'
-        //         }).nodes().to$()
-        //         .find('input[type="checkbox"]').prop('checked', isChecked);
-        // });
-
-        // $(document).on('change', '.custom-datatables tbody input[type="checkbox"]', function() {
-        //     const table = $('.custom-datatables').DataTable();
-        //     const total = table.rows({
-        //             page: 'current'
-        //         }).nodes().to$()
-        //         .find('input[type="checkbox"]').length;
-        //     const checked = table.rows({
-        //             page: 'current'
-        //         }).nodes().to$()
-        //         .find('input[type="checkbox"]:checked').length;
-
-        //     $('#select-all').prop('checked', total === checked);
-        // });
     </script>
 @endsection

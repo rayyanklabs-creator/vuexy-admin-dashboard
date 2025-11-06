@@ -25,7 +25,17 @@ var MainDataTableConfig = {
             { extend: 'pdf', text: '<i class="ti ti-file-description me-1"></i>Pdf', className: 'dropdown-item', exportOptions: { columns: ':not(:last-child)' } },
             { extend: 'copy', text: '<i class="ti ti-copy me-1"></i>Copy', className: 'dropdown-item', exportOptions: { columns: ':not(:last-child)' } }
         ]
-    }]
+    }],
+    initComplete: function () {
+        if ($('#delete-selected').length === 0) {
+            let deleteBtn = `
+                <button id="delete-selected" class="btn delete_confirmation btn-danger ms-2 d-none">
+                    <i class="ti ti-trash"></i>
+                </button>
+            `;
+            $('.dt-buttons').append(deleteBtn);
+        }
+    }
 };
 // ======================================
 // Simple loading indicator approach
@@ -111,7 +121,7 @@ const initServerSideDataTable = (ajaxUrl, columns, pageLength = 10) => {
             },
             columns: columns,
             pageLength: pageLength,
-            
+
         }, MainDataTableConfig));
 
         addSimpleLoadingIndicator(dtTable);

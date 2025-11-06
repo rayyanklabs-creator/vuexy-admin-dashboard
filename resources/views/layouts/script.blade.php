@@ -118,6 +118,7 @@
             buttonsStyling: false
         }).then(function(result) {
             if (result.isConfirmed) {
+                $(document).trigger('delete:confirmed');
                 form.submit();
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire({
