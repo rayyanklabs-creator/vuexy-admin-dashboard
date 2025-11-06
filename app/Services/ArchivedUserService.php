@@ -41,6 +41,11 @@ class ArchivedUserService extends BaseService
         return $this->getBasicQuery()->withTrashed()->findOrFail($id);
     }
 
+    public function getArchivedUsersByIds(array $ids)
+    {
+        return $this->getArchivedUsersQuery()->whereIn('id', $ids);
+    }
+
     public function getArchivedUsersForDataTablesServerSide(Request $request, array $searchableColumns, array $orderableColumns)
     {
         $baseQuery = $this->getBasicQuery()->onlyTrashed();
@@ -60,6 +65,7 @@ class ArchivedUserService extends BaseService
     {
         return [
             'DT_RowId' => 'row_' . $user->id,
+            'checkbox' => '<input type="checkbox" class="form-check-input row-checkbox" value="' . $user->id . '">',
             'sr_no' => $index,
             'name' => $user->name,
             'email' => $user->email,
@@ -72,5 +78,4 @@ class ArchivedUserService extends BaseService
             'actions' => view('dashboard.users.archived.partials.action', compact('user'))->render()
         ];
     }
-
 }

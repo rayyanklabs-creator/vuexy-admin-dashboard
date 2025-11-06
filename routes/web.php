@@ -47,7 +47,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/user/bulk-delete', [UserController::class, 'bulkDelete'])->name('user.bulkDelete');
             Route::resource('user', UserController::class);
             Route::get('/users/data', [UserController::class, 'getUsersData'])->name('user.data');
-
+            
+            Route::delete('/archived-user/bulk-delete', [ArchivedUserController::class, 'bulkDelete'])->name('archived-user.bulkDelete');
             Route::resource('archived-user', ArchivedUserController::class);
             Route::get('/users/archived-user', [ArchivedUserController::class, 'getArchivedUsersData'])->name('archived-user.data');
             Route::get('user/restore/{id}', [ArchivedUserController::class, 'restoreUser'])->name('archived-user.restore');

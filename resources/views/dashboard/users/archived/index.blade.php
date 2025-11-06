@@ -28,6 +28,7 @@
                 <table class="datatables-users table border-top custom-datatables">
                     <thead>
                         <tr>
+                            <th><input type="checkbox" class="form-check-input" id="select-all"></th>
                             <th>{{ __('Sr.') }}</th>
                             <th>{{ __('Name') }}</th>
                             <th>{{ __('Email') }}</th>
@@ -50,7 +51,14 @@
 @endsection
 @section('data-table-script')
     <script>
-        let archivedColumns = [{
+        let archivedColumns = [
+            {
+                data: 'checkbox',
+                name: 'checkbox',
+                orderable: false,
+                searchable: false
+            },
+            {
                 data: 'sr_no',
                 name: 'sr_no',
                 orderable: false,
@@ -92,8 +100,54 @@
         ];
 
 
-        let archivedUserDataTable = initServerSideDataTable("{{ route('dashboard.archived-user.data') }}",
-        archivedColumns);
+        let archivedUserDataTable = initServerSideDataTable("{{ route('dashboard.archived-user.data') }}", archivedColumns);
+        
+        let archivedUserCheckboxManager = initDataTableCheckboxes(archivedUserDataTable);
+
+        $(document).on('click', '#delete-selected', function(e) {
+            e.preventDefault();
+            $(document).one('delete:confirmed', function() {
+                const ids = archivedUserCheckboxManager.getSelectedIds();
+                console.log(ids);
+                let bulkDeleteRoute = "{{ route('dashboard.archived-user.bulkDelete') }}";
+                $.ajax({
+                    url: bulkDeleteRoute,
+                    type: 'DELETE',
+                    data: {
+                        ids: ids,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    beforeSend: function() {
+                        $('#delete-selected').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: response.success ? 'Success!' : 'Error!',
+                                text: response.message,
+                                icon: response.success ? 'success' : 'error',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            archivedUserCheckboxManager.clearSelections();
+                            archivedUserDataTable.ajax.reload(null, false);
+                        }
+                    },
+                    error: function(error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: error.responseJSON.message,
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    complete: function() {
+                        $('#delete-selected').prop('disabled', false).removeClass('opacity-50');
+                    }
+                });
+            });
+        });
 
         $(document).on('ajaxComplete', function(event, xhr, settings) {
             if (settings.url.includes('archived-user.update') || settings.url.includes('archived-user.destroy')) {

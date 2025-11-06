@@ -343,7 +343,6 @@
             @endcanany
         ];
 
-        let selectedIds = [];
 
         let userDataTable = initServerSideDataTable("{{ route('dashboard.user.data') }}", userColumns);
 

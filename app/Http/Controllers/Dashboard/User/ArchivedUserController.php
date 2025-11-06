@@ -91,4 +91,29 @@ class ArchivedUserController extends Controller
             return redirect()->back()->with('error', "Something went wrong! Please try again later");
         }
     }
+
+
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['error' => true, 'message' => 'No users selected.'], 500);
+        }
+        try {
+            
+            $this->archivedUserService->getArchivedUsersByIds($ids)->forceDelete();
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) . ' user(s) deleted successfully.'
+            ]);
+        } catch (\Throwable $th) {
+
+            Log::error('Bulk User Delete Failed', ['error' => $th->getMessage()]);
+            return response()->json([
+                'error' => true,
+                'message' => 'Something went wrong! Please try again later'
+            ], 500);
+        }
+    }
 }
