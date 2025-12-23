@@ -25,7 +25,13 @@
         <!-- Users List Table -->
         <div class="card">
             <div class="card-datatable table-responsive">
-                <table class="datatables-users table border-top custom-datatables">
+                <table class="datatables-users table border-top position-relative custom-datatables">
+                    {{-- <div class="d-flex gap-2">
+                        <select class="form-select" id="bulk-action">
+                            <option value="">{{ __('Select Action') }}</option>
+                                <option value="restore">{{ __('Restore Selected') }}</option>
+                        </select>
+                    </div> --}}
                     <thead>
                         <tr>
                             <th><input type="checkbox" class="form-check-input" id="select-all"></th>
@@ -47,12 +53,10 @@
 @endsection
 
 @section('script')
-    <script></script>
 @endsection
 @section('data-table-script')
     <script>
-        let archivedColumns = [
-            {
+        let archivedColumns = [{
                 data: 'checkbox',
                 name: 'checkbox',
                 orderable: false,
@@ -100,15 +104,15 @@
         ];
 
 
-        let archivedUserDataTable = initServerSideDataTable("{{ route('dashboard.archived-user.data') }}", archivedColumns);
-        
+        let archivedUserDataTable = initServerSideDataTable("{{ route('dashboard.archived-user.data') }}",
+        archivedColumns);
+
         let archivedUserCheckboxManager = initDataTableCheckboxes(archivedUserDataTable);
 
         $(document).on('click', '#delete-selected', function(e) {
             e.preventDefault();
             $(document).one('delete:confirmed', function() {
                 const ids = archivedUserCheckboxManager.getSelectedIds();
-                console.log(ids);
                 let bulkDeleteRoute = "{{ route('dashboard.archived-user.bulkDelete') }}";
                 $.ajax({
                     url: bulkDeleteRoute,
@@ -156,5 +160,5 @@
                 }
             }
         });
-    </script> 
+    </script>
 @endsection

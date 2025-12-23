@@ -44,7 +44,7 @@ var MainDataTableConfig = {
 const addSimpleLoadingIndicator = (dtTable) => {
     var wrapper = dtTable.closest('.custom-datatables');
 
-    var loadingHtml = '<div class="simple-datatable-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9; display: flex; align-items: center; justify-content: center;">' +
+    var loadingHtml = '<div class="simple-datatable-loader overflow-x-auto" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1; display: flex; align-items: center; justify-content: center;">' +
         '<div class="spinner-border text-primary" role="status">' +
         '<span class="visually-hidden">Loading...</span>' +
         '</div>' +

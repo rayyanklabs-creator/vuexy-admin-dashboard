@@ -20,7 +20,7 @@
 @endsection
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl px-0 flex-grow-1 container-p-y">
         <div class="card">
             <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{{ __('Permissions') }}</h4>

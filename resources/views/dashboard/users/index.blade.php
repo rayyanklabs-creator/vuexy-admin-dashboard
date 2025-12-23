@@ -408,7 +408,6 @@
             e.preventDefault();
             $(document).one('delete:confirmed', function() {
                 const ids = userCheckboxManager.getSelectedIds();
-                console.log(ids);
                 let bulkDeleteRoute = "{{ route('dashboard.user.bulkDelete') }}";
                 $.ajax({
                     url: bulkDeleteRoute,

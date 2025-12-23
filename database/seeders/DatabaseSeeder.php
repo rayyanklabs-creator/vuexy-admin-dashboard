@@ -20,14 +20,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserRolePermissionSeeder::class,
         ]);
-        User::factory(5000)
-            ->create()
-            ->each(function ($user) {
-                $user->profile()->create([
-                    'first_name' => $user->name,
-                ]);
+        // User::factory(5000)
+        //     ->create()
+        //     ->each(function ($user) {
+        //         $user->profile()->create([
+        //             'first_name' => $user->name,
+        //         ]);
                 
-                $user->assignRole('user');
-            });
+        //         $user->assignRole('user');
+        //     });
     }
 }
